@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>角色详情</title>
+    <link rel="stylesheet" href="../../main/style.css">
+    <style>
+        .collapsible-item {
+            margin-bottom: var(--spacing-sm);
+        }
+        .collapsible-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-sm);
+            background-color: var(--bg-color);
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .collapsible-header:hover {
+            background-color: var(--hover-bg);
+        }
+        .collapsible-content {
+            padding: var(--spacing-sm);
+            border: 1px solid var(--border-color);
+            border-top: none;
+            border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);
+            display: none;
+        }
+        .collapsible-header.active .collapsible-icon {
+            transform: rotate(180deg);
+        }
+        .collapsible-item.active .collapsible-content {
+            display: block;
+        }
+        .collapsible-icon {
+            transition: transform 0.2s;
+            font-size: var(--font-size-sm);
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div style="display: flex; align-items: center; gap: var(--spacing-lg);">
+            <button onclick="window.location.href='index.html'">返回角色列表</button>
+            <h1 id="character-name">角色详情</h1>
+        </div>
+        <div class="nav-buttons">
+            <button id="edit-btn" class="btn-secondary">编辑</button>
+            <button id="delete-btn" class="btn-outline" disabled>删除</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <!-- 标签页导航 -->
+        <div class="tabs">
+            <div class="tab active" data-tab="profile">人设信息</div>
+            <div class="tab" data-tab="stats">数值信息</div>
+            <div class="tab" data-tab="diaries">日记信息</div>
+            <div class="tab" data-tab="items">物品信息</div>
+            <div class="tab" data-tab="events">事件信息</div>
+        </div>
+
+        <!-- 标签页内容 -->
+        <div class="tab-content active" id="profile-tab">
+            <div style="display: flex; gap: var(--spacing-lg);">
+                <!-- 左侧固定人设 -->
+                <div style="flex: 1; background-color: var(--card-bg); padding: var(--spacing-lg); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-md);">
+                        <h3>固定人设</h3>
+                        <div style="display: flex; gap: var(--spacing-sm);">
+                            <button id="import-fixed-btn" class="btn-secondary btn-sm">导入</button>
+                            <button id="export-fixed-btn" class="btn-secondary btn-sm">导出</button>
+                        </div>
+                    </div>
+                    <div class="collapsible-item">
+                        <div class="collapsible-header" onclick="window.toggleCollapsible(this)">
+                            <strong>描述:</strong>
+                            <span class="collapsible-icon">▼</span>
+                        </div>
+                        <div class="collapsible-content">
+                            <span id="fixed-profile-description">加载中...</span>
+                        </div>
+                    </div>
+                    <div class="collapsible-item">
+                        <div class="collapsible-header" onclick="window.toggleCollapsible(this)">
+                            <strong>性格:</strong>
+                            <span class="collapsible-icon">▼</span>
+                        </div>
+                        <div class="collapsible-content">
+                            <span id="fixed-profile-personality">加载中...</span>
+                        </div>
+                    </div>
+                    <div class="collapsible-item">
+                        <div class="collapsible-header" onclick="window.toggleCollapsible(this)">
+                            <strong>背景:</strong>
+                            <span class="collapsible-icon">▼</span>
+                        </div>
+                        <div class="collapsible-content">
+                            <span id="fixed-profile-background">加载中...</span>
+                        </div>
+                    </div>
+                    <div class="collapsible-item">
+                        <div class="collapsible-header" onclick="window.toggleCollapsible(this)">
+                            <strong>关系:</strong>
+                            <span class="collapsible-icon">▼</span>
+                        </div>
+                        <div class="collapsible-content">
+                            <span id="fixed-profile-relationships">加载中...</span>
+                        </div>
+                    </div>
+                    <div class="collapsible-item">
+                        <div class="collapsible-header" onclick="window.toggleCollapsible(this)">
+                            <strong>场景描写示例:</strong>
+                            <span class="collapsible-icon">▼</span>
+                        </div>
+                        <div class="collapsible-content">
+                            <span id="fixed-profile-scene-examples">加载中...</span>
+                        </div>
+                    </div>
+                    <div class="collapsible-item">
+                        <div class="collapsible-header" onclick="window.toggleCollapsible(this)">
+                            <strong>创作者笔记:</strong>
+                            <span class="collapsible-icon">▼</span>
+                        </div>
+                        <div class="collapsible-content">
+                            <span id="fixed-profile-notes">加载中...</span>
+                        </div>
+                    </div>
+                    <div class="collapsible-item">
+                        <div class="collapsible-header" onclick="window.toggleCollapsible(this)">
+                            <strong>标签:</strong>
+                            <span class="collapsible-icon">▼</span>
+                        </div>
+                        <div class="collapsible-content">
+                            <span id="fixed-profile-tags">加载中...</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 右侧流动人设 -->
+                <div style="flex: 1; background-color: var(--card-bg); padding: var(--spacing-lg); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-md);">
+                        <h3>流动人设</h3>
+                        <button id="export-dynamic-btn" class="btn-secondary btn-sm">导出</button>
+                    </div>
+                    <div class="collapsible-item">
+                        <div class="collapsible-header" onclick="window.toggleCollapsible(this)">
+                            <strong>描述:</strong>
+                            <span class="collapsible-icon">▼</span>
+                        </div>
+                        <div class="collapsible-content">
+                            <span id="dynamic-profile-description">加载中...</span>
+                        </div>
+                    </div>
+                    <div class="collapsible-item">
+                        <div class="collapsible-header" onclick="window.toggleCollapsible(this)">
+                            <strong>性格:</strong>
+                            <span class="collapsible-icon">▼</span>
+                        </div>
+                        <div class="collapsible-content">
+                            <span id="dynamic-profile-personality">加载中...</span>
+                        </div>
+                    </div>
+                    <div class="collapsible-item">
+                        <div class="collapsible-header" onclick="window.toggleCollapsible(this)">
+                            <strong>背景:</strong>
+                            <span class="collapsible-icon">▼</span>
+                        </div>
+                        <div class="collapsible-content">
+                            <span id="dynamic-profile-background">加载中...</span>
+                        </div>
+                    </div>
+                    <div class="collapsible-item">
+                        <div class="collapsible-header" onclick="window.toggleCollapsible(this)">
+                            <strong>关系:</strong>
+                            <span class="collapsible-icon">▼</span>
+                        </div>
+                        <div class="collapsible-content">
+                            <span id="dynamic-profile-relationships">加载中...</span>
+                        </div>
+                    </div>
+                    <div class="collapsible-item">
+                        <div class="collapsible-header" onclick="window.toggleCollapsible(this)">
+                            <strong>场景描写示例:</strong>
+                            <span class="collapsible-icon">▼</span>
+                        </div>
+                        <div class="collapsible-content">
+                            <span id="dynamic-profile-scene-examples">加载中...</span>
+                        </div>
+                    </div>
+                    <div class="collapsible-item">
+                        <div class="collapsible-header" onclick="window.toggleCollapsible(this)">
+                            <strong>创作者笔记:</strong>
+                            <span class="collapsible-icon">▼</span>
+                        </div>
+                        <div class="collapsible-content">
+                            <span id="dynamic-profile-notes">加载中...</span>
+                        </div>
+                    </div>
+                    <div class="collapsible-item">
+                        <div class="collapsible-header" onclick="window.toggleCollapsible(this)">
+                            <strong>标签:</strong>
+                            <span class="collapsible-icon">▼</span>
+                        </div>
+                        <div class="collapsible-content">
+                            <span id="dynamic-profile-tags">加载中...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="stats-tab">
+            <div style="background-color: var(--card-bg); padding: var(--spacing-lg); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);">
+                <div id="stats-list">
+                    <!-- 数值信息将通过JavaScript动态生成 -->
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="diaries-tab">
+            <div style="background-color: var(--card-bg); padding: var(--spacing-lg); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);">
+                <div id="diaries-list">
+                    <!-- 日记信息将通过JavaScript动态生成 -->
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="items-tab">
+            <div style="background-color: var(--card-bg); padding: var(--spacing-lg); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);">
+                <div id="items-list">
+                    <!-- 物品信息将通过JavaScript动态生成 -->
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="events-tab">
+            <div style="background-color: var(--card-bg); padding: var(--spacing-lg); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);">
+                <h3>未完成事件</h3>
+                <div id="pending-events-list">
+                    <!-- 未完成事件将通过JavaScript动态生成 -->
+                </div>
+                
+                <h3 style="margin-top: var(--spacing-xl);">已完成事件</h3>
+                <div id="completed-events-list">
+                    <!-- 已完成事件将通过JavaScript动态生成 -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../../main/storage.js"></script>
+    <script src="../../main/helpers.js"></script>
+    <script src="profile.js"></script>
+</body>
+</html>

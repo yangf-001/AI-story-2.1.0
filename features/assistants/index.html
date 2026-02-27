@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小助手管理</title>
+    <link rel="stylesheet" href="../../main/style.css">
+    <style>
+        /* 主内容区调整 */
+        .main-content {
+            padding: var(--spacing-xl);
+            max-width: 1200px;
+            margin: 0 auto;
+            min-height: calc(100vh - 160px);
+            margin-top: 100px; /* 为固定导航栏留出空间 */
+        }
+
+        /* 侧边栏样式 */
+        .sidebar {
+            width: 300px;
+            background: linear-gradient(135deg, var(--card-bg), var(--bg-light));
+            padding: var(--spacing-lg);
+            border-radius: var(--border-radius-xl);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            transition: var(--transition-all);
+        }
+
+        .sidebar:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .sidebar h3 {
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            margin-bottom: var(--spacing-lg);
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .sidebar h3::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: var(--border-radius-full);
+        }
+
+        #assistants-list,
+        #characters-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border-radius: var(--border-radius-lg);
+            border: 1px solid var(--border-color);
+            background-color: var(--card-bg);
+        }
+
+        #assistants-list > div,
+        #characters-list > div {
+            padding: var(--spacing-md);
+            border-bottom: 1px solid var(--border-light);
+            cursor: pointer;
+            transition: var(--transition-all);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #assistants-list > div::before,
+        #characters-list > div::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        #assistants-list > div:hover::before,
+        #characters-list > div:hover::before {
+            left: 100%;
+        }
+
+        #assistants-list > div:hover,
+        #characters-list > div:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+            transform: translateX(4px);
+        }
+
+        #assistants-list > div:last-child,
+        #characters-list > div:last-child {
+            border-bottom: none;
+        }
+
+        .header {
+            margin-bottom: var(--spacing-xl);
+            padding-bottom: var(--spacing-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header h2 {
+            font-size: var(--font-size-2xl);
+            font-weight: 700;
+            margin-bottom: var(--spacing-sm);
+            color: var(--primary-color);
+        }
+
+        #selected-assistant {
+            font-size: var(--font-size-lg);
+            color: var(--text-light);
+        }
+
+        .assistant-panels {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: var(--spacing-xl);
+        }
+
+        .panel {
+            background: linear-gradient(135deg, var(--card-bg), var(--bg-light));
+            border-radius: var(--border-radius-xl);
+            box-shadow: var(--shadow-md);
+            padding: var(--spacing-xl);
+            border: 1px solid var(--border-color);
+            transition: var(--transition-all);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .panel:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-4px);
+            border-color: var(--primary-light);
+        }
+
+        .panel h3 {
+            font-size: var(--font-size-xl);
+            font-weight: 600;
+            margin-bottom: var(--spacing-lg);
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .form-group {
+            margin-bottom: var(--spacing-lg);
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: var(--spacing-sm);
+            font-weight: 500;
+            color: var(--text-color);
+            font-size: var(--font-size-sm);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: var(--spacing-md);
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            font-size: var(--font-size-base);
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            transition: var(--transition-all);
+            outline: none;
+            position: relative;
+            z-index: 1;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 150px;
+            padding: var(--spacing-lg);
+        }
+
+        button {
+            font-family: var(--font-family);
+            font-size: var(--font-size-base);
+            font-weight: 500;
+            padding: var(--spacing-sm) var(--spacing-lg);
+            border: none;
+            border-radius: var(--border-radius-lg);
+            cursor: pointer;
+            transition: var(--transition-all);
+            outline: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        button:active {
+            transform: translateY(0);
+            box-shadow: var(--shadow-md);
+        }
+
+        .stat-item,
+        .diary-item,
+        .item-item,
+        .event-item {
+            background: linear-gradient(135deg, var(--card-bg), var(--bg-light));
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition-all);
+        }
+
+        .stat-item:hover,
+        .diary-item:hover,
+        .item-item:hover,
+        .event-item:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .stat-item {
+            display: flex;
+            gap: var(--spacing-md);
+            align-items: center;
+        }
+
+        .stat-item input {
+            flex: 1;
+            padding: var(--spacing-sm);
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            transition: var(--transition-all);
+        }
+
+        .stat-item input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .stat-item .remove-stat,
+        .diary-item .remove-diary,
+        .item-item .remove-item,
+        .event-item .remove-event,
+        .event-item .complete-event {
+            padding: var(--spacing-xs) var(--spacing-sm);
+            font-size: var(--font-size-sm);
+            border-radius: var(--border-radius-md);
+            transition: var(--transition-all);
+        }
+
+        .stat-item .remove-stat,
+        .diary-item .remove-diary,
+        .item-item .remove-item,
+        .event-item .remove-event {
+            background: linear-gradient(135deg, var(--error-color), #DC2626);
+            color: white;
+        }
+
+        .event-item .complete-event {
+            background: linear-gradient(135deg, var(--success-color), #059669);
+            color: white;
+            margin-right: var(--spacing-sm);
+        }
+
+        .stat-item .remove-stat:hover,
+        .diary-item .remove-diary:hover,
+        .item-item .remove-item:hover,
+        .event-item .remove-event:hover {
+            background: linear-gradient(135deg, #DC2626, #B91C1C);
+        }
+
+        .event-item .complete-event:hover {
+            background: linear-gradient(135deg, #059669, #047857);
+        }
+
+        .event-item.completed {
+            opacity: 0.7;
+            background: linear-gradient(135deg, var(--success-light), var(--bg-light));
+        }
+
+        .add-stat,
+        .add-diary,
+        .add-item,
+        .add-event {
+            margin-top: var(--spacing-lg);
+            padding-top: var(--spacing-lg);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .add-stat {
+            display: flex;
+            gap: var(--spacing-md);
+            align-items: flex-end;
+        }
+
+        .add-stat input {
+            flex: 1;
+            padding: var(--spacing-sm);
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            transition: var(--transition-all);
+        }
+
+        .add-stat input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .add-diary textarea,
+        .add-item textarea {
+            width: 100%;
+            margin-bottom: var(--spacing-md);
+            padding: var(--spacing-sm);
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            resize: vertical;
+            min-height: 100px;
+            transition: var(--transition-all);
+        }
+
+        .add-diary textarea:focus,
+        .add-item textarea:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .add-item input {
+            width: 100%;
+            margin-bottom: var(--spacing-sm);
+            padding: var(--spacing-sm);
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            transition: var(--transition-all);
+        }
+
+        .add-item input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .add-event {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+
+        .add-event input,
+        .add-event select {
+            padding: var(--spacing-sm);
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            transition: var(--transition-all);
+        }
+
+        .add-event input:focus,
+        .add-event select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .events-section {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .events-section h4 {
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            margin-bottom: var(--spacing-md);
+            color: var(--text-color);
+        }
+
+        .message {
+            padding: var(--spacing-md);
+            background: linear-gradient(135deg, var(--info-light), var(--bg-light));
+            border: 1px solid var(--info-color);
+            border-radius: var(--border-radius-lg);
+            margin: var(--spacing-md) 0;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition-all);
+        }
+
+        .message:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: var(--spacing-lg);
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition-all);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--border-radius-md);
+        }
+
+        .back-link:hover {
+            text-decoration: none;
+            background-color: rgba(59, 130, 246, 0.1);
+            transform: translateX(-4px);
+        }
+
+        /* 小助手页面主内容布局 */
+        .assistants-content {
+            display: flex;
+            gap: var(--spacing-xl);
+            align-items: flex-start;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1024px) {
+            .assistant-panels {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: var(--spacing-md);
+            }
+
+            .assistants-content {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                margin-bottom: var(--spacing-xl);
+            }
+
+            .assistant-panels {
+                gap: var(--spacing-lg);
+            }
+
+            .panel {
+                padding: var(--spacing-lg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div style="display: flex; align-items: center; gap: var(--spacing-md); width: 100%; justify-content: space-between; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: var(--spacing-md); flex-shrink: 0;">
+                <button onclick="window.location.href='../world-management/index.html'" class="btn-sm">返回上一页</button>
+                <h1 style="font-size: 1.5rem;">小助手管理</h1>
+            </div>
+            <div style="flex: 0 1 auto; min-width: 150px; text-align: center; font-size: 1rem; font-weight: 700; color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.5); padding: 8px 16px; background-color: rgba(59, 130, 246, 0.8); border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.2); cursor: pointer;" onclick="editTime()">
+                <span id="currentTime">加载中...</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: var(--spacing-md);">
+                <div id="assistants-status" style="display: grid; grid-template-columns: repeat(2, auto); gap: var(--spacing-xs); align-items: center; max-width: 300px;">
+                    <!-- 小助手状态将通过JavaScript动态生成 -->
+                </div>
+                <div style="font-size: var(--font-size-xs); color: white; opacity: 0.8; margin-left: var(--spacing-sm); padding: 2px 8px; background-color: rgba(0, 0, 0, 0.2); border-radius: var(--border-radius-sm);">
+                    v2.1.13
+                </div>
+            </div>
+        </div>
+        
+        <!-- 时间编辑模态框 -->
+        <div id="time-edit-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1000; justify-content: center; align-items: center;">
+            <div style="background-color: var(--card-bg); padding: var(--spacing-xl); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); max-width: 400px; width: 100%;">
+                <h3>编辑时间</h3>
+                <div class="form-group">
+                    <label for="time-input">选择时间</label>
+                    <input type="datetime-local" id="time-input" class="form-input" style="width: 100%;">
+                </div>
+                <div style="display: flex; gap: var(--spacing-md); justify-content: flex-end; margin-top: var(--spacing-lg);">
+                    <button onclick="closeTimeModal()" class="btn-outline">取消</button>
+                    <button onclick="saveTime()" class="btn-primary">保存</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <style>
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 10px;
+            }
+            .navbar h1 {
+                font-size: 1.2rem !important;
+            }
+            .navbar button {
+                font-size: 0.8rem !important;
+                padding: 6px 12px !important;
+            }
+            #currentTime {
+                font-size: 1rem !important;
+            }
+        }
+        @media (max-width: 480px) {
+            .navbar > div {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            .navbar > div > div {
+                width: 100%;
+                margin: 5px 0;
+            }
+            .nav-buttons {
+                width: 100%;
+                justify-content: center !important;
+            }
+            #currentTime {
+                font-size: 0.9rem !important;
+            }
+        }
+    </style>
+
+    <main class="main-content">
+        <!-- 导入导出配置按钮 -->
+        <div id="import-export-container" style="display: flex; gap: var(--spacing-lg); margin-bottom: var(--spacing-xl); padding: var(--spacing-lg); background: linear-gradient(135deg, var(--card-bg), var(--bg-light)); border-radius: var(--border-radius-xl); box-shadow: var(--shadow-md); flex-wrap: wrap; width: 100%; z-index: 100; position: relative; border: 1px solid var(--border-color);">
+            <button id="export-all-assistants" style="background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); color: white; padding: var(--spacing-md) var(--spacing-lg); border: none; border-radius: var(--border-radius-lg); flex: 1; min-width: 200px; font-size: var(--font-size-base); font-weight: 500; transition: var(--transition-all); position: relative; overflow: hidden;">
+                导出所有小助手
+            </button>
+            <label for="import-assistants" id="import-assistants-btn" style="background: linear-gradient(135deg, var(--success-color), #059669); color: white; padding: var(--spacing-md) var(--spacing-lg); border: none; border-radius: var(--border-radius-lg); flex: 1; min-width: 200px; font-size: var(--font-size-base); font-weight: 500; transition: var(--transition-all); position: relative; overflow: hidden; cursor: pointer; display: inline-block;">
+                导入小助手
+                <input type="file" id="import-assistants" accept=".json" style="display: none;">
+            </label>
+            <button id="global-config-btn" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; padding: var(--spacing-md) var(--spacing-lg); border: none; border-radius: var(--border-radius-lg); flex: 1; min-width: 200px; font-size: var(--font-size-base); font-weight: 500; transition: var(--transition-all); position: relative; overflow: hidden;">
+                配置
+            </button>
+        </div>
+        
+        <!-- 全局配置面板 -->
+        <div id="global-config-panel" style="display: none; margin-bottom: var(--spacing-xl); padding: var(--spacing-lg); background: linear-gradient(135deg, var(--card-bg), var(--bg-light)); border-radius: var(--border-radius-xl); box-shadow: var(--shadow-md); border: 1px solid var(--border-color);">
+            <h3 style="color: #8b5cf6; margin-bottom: var(--spacing-lg);">全局小助手配置</h3>
+            <div class="form-group">
+                <label for="global-api-key">全局API密钥:</label>
+                <input type="password" id="global-api-key" placeholder="输入全局API密钥" />
+            </div>
+            <div class="form-group">
+                <label for="global-api-model">全局模型:</label>
+                <input type="text" id="global-api-model" value="deepseek-chat" placeholder="例如：deepseek-chat" />
+            </div>
+            <div class="form-group">
+                <label for="global-api-temperature">全局温度:</label>
+                <input type="number" id="global-api-temperature" value="0.7" min="0" max="1" step="0.1" />
+            </div>
+            <div class="form-group">
+                <label for="global-api-max-tokens">全局最大令牌数:</label>
+                <input type="number" id="global-api-max-tokens" value="1000" min="1" />
+            </div>
+            <div style="display: flex; gap: var(--spacing-md);">
+                <button id="save-global-config" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; padding: var(--spacing-md) var(--spacing-lg); border: none; border-radius: var(--border-radius-lg); flex: 1;">
+                    保存全局配置
+                </button>
+                <button id="test-global-config" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: var(--spacing-md) var(--spacing-lg); border: none; border-radius: var(--border-radius-lg); flex: 1;">
+                    测试配置
+                </button>
+            </div>
+        </div>
+        
+        <div class="assistants-content" style="display: flex; gap: var(--spacing-xl);">
+            <!-- 左侧边栏 -->
+            <aside class="sidebar" style="display: flex; flex-direction: column; gap: var(--spacing-lg);">
+                <!-- 小助手列表 -->
+                <div>
+                    <h3>小助手列表</h3>
+                    <div id="assistants-list">
+                        <!-- 小助手列表将由JS动态生成 -->
+                    </div>
+                </div>
+                
+                <!-- 角色列表 -->
+                <div>
+                    <h3>角色列表</h3>
+                    <div id="characters-list">
+                        <!-- 角色列表将由JS动态生成 -->
+                    </div>
+                </div>
+            </aside>
+            
+            <!-- 右侧内容 -->
+            <div style="flex: 1;">
+                <div class="header">
+                    <h2>小助手管理</h2>
+                    <p id="selected-assistant">请选择一个小助手</p>
+                </div>
+                
+                <div class="assistant-panels">
+                    <div class="panel" id="assistant-profile-panel">
+                        <h3>小助手人设管理</h3>
+                        <p>请选择一个小助手查看和编辑人设</p>
+                    </div>
+                    
+                    <div class="panel" id="assistant-settings-panel">
+                        <h3>小助手设置</h3>
+                        <p>请选择一个小助手查看和编辑设置</p>
+                    </div>
+                    
+                    <div class="panel" id="character-info-panel" style="display: none;">
+                        <h3>角色信息</h3>
+                        <p>请选择一个角色查看详细信息</p>
+                    </div>
+                </div>
+                
+                <div id="message-container"></div>
+            </div>
+        </div>
+    </main>
+
+
+
+    <script src="../../main/storage.js"></script>
+    <script src="../../main/api.js"></script>
+    <script src="../../main/helpers.js"></script>
+    <script type="module" src="assistants.js"></script>
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>编辑角色</title>
+    <link rel="stylesheet" href="../../main/style.css">
+</head>
+<body>
+    <header class="navbar">
+        <div style="display: flex; align-items: center; gap: var(--spacing-lg);">
+            <button id="back-btn" class="btn-outline">返回</button>
+            <h1 id="page-title">编辑角色</h1>
+        </div>
+        <div class="nav-buttons">
+            <button id="save-btn" class="btn-primary">保存</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <!-- 基本信息 -->
+        <div style="background-color: var(--card-bg); padding: var(--spacing-lg); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); margin-bottom: var(--spacing-lg);">
+            <div class="form-group">
+                <label for="character-name">角色名称</label>
+                <input type="text" id="character-name" placeholder="请输入角色名称" required>
+            </div>
+            <div class="form-group" style="display: flex; align-items: center; gap: var(--spacing-md);">
+                <input type="checkbox" id="character-is-main">
+                <label for="character-is-main">设为主角</label>
+            </div>
+            <div class="form-group" style="display: flex; align-items: center; gap: var(--spacing-md);">
+                <input type="checkbox" id="character-is-temporary">
+                <label for="character-is-temporary">设为临时角色</label>
+            </div>
+        </div>
+
+        <!-- 固定角色详细设置 -->
+        <div id="permanent-character-settings" style="display: block;">
+            <!-- 标签页导航 -->
+            <div class="tabs">
+                <div class="tab active" data-tab="profile">人设信息</div>
+                <div class="tab" data-tab="stats">数值信息</div>
+                <div class="tab" data-tab="diaries">日记信息</div>
+                <div class="tab" data-tab="items">物品信息</div>
+                <div class="tab" data-tab="events">事件信息</div>
+            </div>
+
+            <!-- 标签页内容 -->
+            <div class="tab-content active" id="profile-tab">
+                <div style="display: flex; gap: var(--spacing-lg);">
+                    <!-- 左侧固定人设编辑 -->
+                    <div style="flex: 1; background-color: var(--card-bg); padding: var(--spacing-lg); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);">
+                        <h3 style="margin-bottom: var(--spacing-md);">固定人设</h3>
+                        <div class="form-group">
+                            <label for="fixed-profile-description">描述</label>
+                            <textarea id="fixed-profile-description" placeholder="请输入角色描述"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="fixed-profile-personality">性格</label>
+                            <textarea id="fixed-profile-personality" placeholder="请输入角色性格"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="fixed-profile-background">背景</label>
+                            <textarea id="fixed-profile-background" placeholder="请输入角色背景"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="fixed-profile-relationships">关系</label>
+                            <textarea id="fixed-profile-relationships" placeholder="请输入角色关系，多个关系用逗号分隔"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="fixed-profile-scene-examples">场景描写示例</label>
+                            <textarea id="fixed-profile-scene-examples" placeholder="请输入场景描写示例"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="fixed-profile-notes">创作者笔记</label>
+                            <textarea id="fixed-profile-notes" placeholder="请输入创作者笔记"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="fixed-profile-tags">标签</label>
+                            <textarea id="fixed-profile-tags" placeholder="请输入标签，多个标签用逗号分隔"></textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- 右侧流动人设编辑 -->
+                    <div style="flex: 1; background-color: var(--card-bg); padding: var(--spacing-lg); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);">
+                        <h3 style="margin-bottom: var(--spacing-md);">流动人设</h3>
+                        <div class="form-group">
+                            <label for="dynamic-profile-description">描述</label>
+                            <textarea id="dynamic-profile-description" placeholder="请输入角色描述"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="dynamic-profile-personality">性格</label>
+                            <textarea id="dynamic-profile-personality" placeholder="请输入角色性格"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="dynamic-profile-background">背景</label>
+                            <textarea id="dynamic-profile-background" placeholder="请输入角色背景"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="dynamic-profile-relationships">关系</label>
+                            <textarea id="dynamic-profile-relationships" placeholder="请输入角色关系，多个关系用逗号分隔"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="dynamic-profile-scene-examples">场景描写示例</label>
+                            <textarea id="dynamic-profile-scene-examples" placeholder="请输入场景描写示例"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="dynamic-profile-notes">创作者笔记</label>
+                            <textarea id="dynamic-profile-notes" placeholder="请输入创作者笔记"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="dynamic-profile-tags">标签</label>
+                            <textarea id="dynamic-profile-tags" placeholder="请输入标签，多个标签用逗号分隔"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="stats-tab">
+                <div style="background-color: var(--card-bg); padding: var(--spacing-lg); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);">
+                    <div id="stats-editor">
+                        <!-- 数值编辑将通过JavaScript动态生成 -->
+                    </div>
+                    <button id="add-stat-btn" class="btn-outline" style="margin-top: var(--spacing-md);">添加数值</button>
+                </div>
+            </div>
+
+            <div class="tab-content" id="diaries-tab">
+                <div style="background-color: var(--card-bg); padding: var(--spacing-lg); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);">
+                    <div id="diaries-editor">
+                        <!-- 日记编辑将通过JavaScript动态生成 -->
+                    </div>
+                    <button id="add-diary-btn" class="btn-outline" style="margin-top: var(--spacing-md);">添加日记</button>
+                </div>
+            </div>
+
+            <div class="tab-content" id="items-tab">
+                <div style="background-color: var(--card-bg); padding: var(--spacing-lg); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);">
+                    <div id="items-editor">
+                        <!-- 物品编辑将通过JavaScript动态生成 -->
+                    </div>
+                    <button id="add-item-btn" class="btn-outline" style="margin-top: var(--spacing-md);">添加物品</button>
+                </div>
+            </div>
+
+            <div class="tab-content" id="events-tab">
+                <div style="background-color: var(--card-bg); padding: var(--spacing-lg); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);">
+                    <h3>未完成事件</h3>
+                    <div id="pending-events-editor">
+                        <!-- 未完成事件编辑将通过JavaScript动态生成 -->
+                    </div>
+                    <button id="add-pending-event-btn" class="btn-outline" style="margin-top: var(--spacing-md);">添加未完成事件</button>
+
+                    <h3 style="margin-top: var(--spacing-xl);">已完成事件</h3>
+                    <div id="completed-events-editor">
+                        <!-- 已完成事件编辑将通过JavaScript动态生成 -->
+                    </div>
+                    <button id="add-completed-event-btn" class="btn-outline" style="margin-top: var(--spacing-md);">添加已完成事件</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 临时角色简化设置 -->
+        <div id="temporary-character-settings" style="display: none; background-color: var(--card-bg); padding: var(--spacing-lg); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);">
+            <h3 style="margin-bottom: var(--spacing-lg);">临时角色信息</h3>
+            <div class="form-group">
+                <label for="temporary-profile-description">角色描述</label>
+                <textarea id="temporary-profile-description" placeholder="请输入角色描述"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="temporary-profile-personality">性格</label>
+                <input type="text" id="temporary-profile-personality" placeholder="请输入角色性格">
+            </div>
+            <div class="form-group">
+                <label for="temporary-profile-tags">标签</label>
+                <input type="text" id="temporary-profile-tags" placeholder="请输入标签，多个标签用逗号分隔">
+            </div>
+        </div>
+    </main>
+
+    <script src="../../main/storage.js"></script>
+    <script src="../../main/helpers.js"></script>
+    <script src="card.js"></script>
+</body>
+</html>

@@ -1,0 +1,286 @@
+.message {
+    padding: var(--spacing-sm) 0;
+    animation: messageSlideIn 0.3s ease-out;
+}
+
+@keyframes messageSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.message-content {
+    display: flex;
+    flex-direction: column;
+    margin: var(--spacing-sm) 0;
+    gap: var(--spacing-xs);
+}
+
+.message-content-right {
+    align-items: flex-end;
+}
+
+.message-content-left {
+    align-items: flex-start;
+}
+
+.message-content-center {
+    align-items: center;
+}
+
+.message-sender {
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+    color: var(--text-light);
+    margin: 0;
+    padding: 0 var(--spacing-xs);
+}
+
+.message-bubble {
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-radius: var(--border-radius-xl);
+    max-width: 80%;
+    box-shadow: var(--shadow-md);
+    word-wrap: break-word;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.message-bubble:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* 用户消息气泡 */
+.message-content-right .message-bubble {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    border-bottom-right-radius: var(--border-radius-sm);
+}
+
+/* AI角色消息气泡 */
+.message-content-left .message-bubble {
+    background: linear-gradient(135deg, var(--card-bg), var(--bg-light));
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-bottom-left-radius: var(--border-radius-sm);
+}
+
+/* 不同角色的消息气泡颜色 */
+.message-content-left.role-1 .message-bubble {
+    background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+    color: white;
+    border: none;
+}
+
+.message-content-left.role-2 .message-bubble {
+    background: linear-gradient(135deg, #4ECDC4, #45B7D1);
+    color: white;
+    border: none;
+}
+
+.message-content-left.role-3 .message-bubble {
+    background: linear-gradient(135deg, #96CEB4, #FFEAA7);
+    color: var(--text-color);
+    border: none;
+}
+
+.message-content-left.role-4 .message-bubble {
+    background: linear-gradient(135deg, #DDA0DD, #9370DB);
+    color: white;
+    border: none;
+}
+
+.message-content-left.role-5 .message-bubble {
+    background: linear-gradient(135deg, #98D8C8, #F7DC6F);
+    color: var(--text-color);
+    border: none;
+}
+
+.message-time {
+    font-size: var(--font-size-xs);
+    color: var(--text-light);
+    opacity: 0.6;
+    margin: 0;
+    padding: 0 var(--spacing-xs);
+    margin-top: 2px;
+}
+
+.system-message {
+    background: linear-gradient(135deg, var(--info-light), var(--info-color));
+    color: white;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--border-radius-full);
+    font-size: var(--font-size-sm);
+    max-width: 70%;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+    margin: var(--spacing-md) auto;
+}
+
+.narration-message {
+    background: linear-gradient(135deg, var(--success-light), var(--info-light));
+    color: var(--text-color);
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-radius: var(--border-radius-xl);
+    max-width: 90%;
+    border-left: 4px solid var(--primary-color);
+    box-shadow: var(--shadow-sm);
+    margin: var(--spacing-md) auto;
+}
+
+/* 场景卡片样式 */
+.scene-card {
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-lg);
+    margin: var(--spacing-md) 0;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.scene-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+/* 不同场景类型的背景样式 */
+.scene-default {
+    background: linear-gradient(135deg, var(--card-bg), var(--bg-light));
+}
+
+.scene-school {
+    background: linear-gradient(135deg, #E0F7FA, #B2EBF2);
+    border-left: 4px solid #00BCD4;
+}
+
+.scene-home {
+    background: linear-gradient(135deg, #FFF3E0, #FFE0B2);
+    border-left: 4px solid #FF9800;
+}
+
+.scene-park {
+    background: linear-gradient(135deg, #E8F5E8, #C8E6C9);
+    border-left: 4px solid #4CAF50;
+}
+
+.scene-street {
+    background: linear-gradient(135deg, #ECEFF1, #CFD8DC);
+    border-left: 4px solid #607D8B;
+}
+
+.scene-office {
+    background: linear-gradient(135deg, #E3F2FD, #BBDEFB);
+    border-left: 4px solid #2196F3;
+}
+
+.scene-forest {
+    background: linear-gradient(135deg, #E8F5E8, #A5D6A7);
+    border-left: 4px solid #388E3C;
+}
+
+.scene-beach {
+    background: linear-gradient(135deg, #E3F2FD, #B3E5FC);
+    border-left: 4px solid #03A9F4;
+}
+
+.scene-city {
+    background: linear-gradient(135deg, #ECEFF1, #B0BEC5);
+    border-left: 4px solid #455A64;
+}
+
+.scene-village {
+    background: linear-gradient(135deg, #FFF8E1, #FFECB3);
+    border-left: 4px solid #FFC107;
+}
+
+/* 消息头像 */
+.message-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    margin: 0 var(--spacing-sm);
+    flex-shrink: 0;
+    box-shadow: var(--shadow-sm);
+    border: 2px solid var(--border-color);
+}
+
+.message-content-with-avatar {
+    display: flex;
+    align-items: flex-start;
+}
+
+.message-content-with-avatar .message-content {
+    flex: 1;
+}
+
+/* 消息状态指示器 */
+.message-status {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 4px;
+    font-size: var(--font-size-xs);
+    color: var(--text-light);
+}
+
+.message-status.sent {
+    color: var(--success-color);
+}
+
+.message-status.delivered {
+    color: var(--info-color);
+}
+
+.message-status.read {
+    color: var(--primary-color);
+}
+
+/* 消息加载动画 */
+.message-loading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: var(--spacing-md);
+}
+
+.message-loading-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--text-light);
+    animation: loadingPulse 1.4s infinite ease-in-out both;
+}
+
+.message-loading-dot:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.message-loading-dot:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+@keyframes loadingPulse {
+    0%, 80%, 100% {
+        transform: scale(0);
+    }
+    40% {
+        transform: scale(1);
+    }
+}
+
+/* 消息错误样式 */
+.message-error {
+    background-color: var(--error-light);
+    color: var(--error-color);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--border-radius-lg);
+    font-size: var(--font-size-sm);
+    margin: var(--spacing-sm) 0;
+    border-left: 4px solid var(--error-color);
+}

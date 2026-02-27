@@ -1,0 +1,49 @@
+{
+  "name": "AI故事生成器",
+  "short_name": "AI故事",
+  "description": "一个功能强大的AI故事生成器应用",
+  "start_url": "./main/index.html",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#F9FAFB",
+  "theme_color": "#3B82F6",
+  "icons": [
+    {
+      "src": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=AI%20story%20generator%20icon%20with%20book%20and%20robot%20illustration%2C%20modern%20flat%20design%2C%20blue%20and%20purple%20colors&image_size=square",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=AI%20story%20generator%20icon%20with%20book%20and%20robot%20illustration%2C%20modern%20flat%20design%2C%20blue%20and%20purple%20colors&image_size=square",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=AI%20story%20generator%20icon%20with%20book%20and%20robot%20illustration%2C%20modern%20flat%20design%2C%20blue%20and%20purple%20colors&image_size=square",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "orientation": "any",
+  "categories": ["entertainment", "productivity", "education"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "创建新剧情世界",
+      "short_name": "创建世界",
+      "description": "创建一个新的剧情世界",
+      "url": "./features/world-management/create.html",
+      "icons": [{ "src": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=create%20world%20icon%2C%20simple%20flat%20design&image_size=square", "sizes": "192x192" }]
+    },
+    {
+      "name": "API配置",
+      "short_name": "API",
+      "description": "配置API设置",
+      "url": "./features/api-config/index.html",
+      "icons": [{ "src": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=API%20config%20icon%2C%20simple%20flat%20design&image_size=square", "sizes": "192x192" }]
+    }
+  ]
+}

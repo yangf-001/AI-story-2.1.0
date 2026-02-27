@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>多平台支持</title>
+  <link rel="stylesheet" href="../../main/style.css">
+  <style>
+    .platform-container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .platform-section {
+      background: #f9f9f9;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 30px;
+      border: 1px solid #e0e0e0;
+    }
+
+    .platform-section h3 {
+      margin-top: 0;
+      margin-bottom: 20px;
+      color: var(--primary-color);
+      font-size: 1.3rem;
+      border-bottom: 2px solid var(--primary-color);
+      padding-bottom: 10px;
+    }
+
+    .platform-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .platform-item {
+      background: white;
+      padding: 15px;
+      border-radius: 6px;
+      border: 1px solid #e0e0e0;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .platform-label {
+      font-size: 0.9rem;
+      color: #666;
+      font-weight: 500;
+    }
+
+    .platform-value {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin: 30px 0;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .suggestions-list {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .suggestions-list li {
+      background: white;
+      padding: 10px 15px;
+      border-radius: 6px;
+      border: 1px solid #e0e0e0;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .suggestions-list li:before {
+      content: "💡";
+      font-size: 1rem;
+    }
+
+    .pwa-status {
+      background: white;
+      padding: 20px;
+      border-radius: 6px;
+      border: 1px solid #e0e0e0;
+    }
+
+    .status-item {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .status-label {
+      font-size: 0.9rem;
+      color: #666;
+      font-weight: 500;
+    }
+
+    .status-value {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+
+    .pwa-install-instructions {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f0f8ff;
+      border-radius: 6px;
+      border: 1px solid #b8e1ff;
+    }
+
+    .pwa-install-instructions h4 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      color: var(--secondary-color);
+    }
+
+    .pwa-install-instructions ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .pwa-install-instructions li {
+      margin-bottom: 5px;
+    }
+
+    .compatibility-result {
+      background: white;
+      padding: 20px;
+      border-radius: 6px;
+      border: 1px solid #e0e0e0;
+      margin-top: 15px;
+    }
+
+    .compatibility-result.supported {
+      border-color: #4CAF50;
+      background: #f8fff8;
+    }
+
+    .compatibility-result.unsupported {
+      border-color: #ff4444;
+      background: #fff8f8;
+    }
+
+    .compatibility-result h4 {
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+
+    .back-button {
+      margin-top: 30px;
+      text-align: center;
+    }
+
+    @media (max-width: 768px) {
+      .platform-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .actions {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .actions button {
+        width: 100%;
+        max-width: 300px;
+      }
+    }
+  </style>
+</head>
+<body>
+    <header class="navbar">
+        <div style="display: flex; align-items: center; gap: var(--spacing-lg);">
+            <button onclick="window.location.href='../world-management/index.html'">返回上一页</button>
+            <h1>多平台支持</h1>
+        </div>
+    </header>
+
+    <main class="main-content platform-container" style="margin-top: 100px;">
+      <!-- 操作按钮 -->
+      <div class="actions">
+        <button id="refreshPlatformInfo" class="btn btn-primary">刷新平台信息</button>
+        <button id="applyOptimizations" class="btn btn-secondary">应用性能优化</button>
+        <button id="checkCompatibility" class="btn btn-secondary">检查浏览器兼容性</button>
+      </div>
+
+      <!-- 平台信息 -->
+      <section class="platform-section" id="platformInfo">
+        <h3>平台信息</h3>
+        <div class="platform-grid">
+          <div class="platform-item">
+            <span class="platform-label">设备类型:</span>
+            <span class="platform-value">加载中...</span>
+          </div>
+          <div class="platform-item">
+            <span class="platform-label">操作系统:</span>
+            <span class="platform-value">加载中...</span>
+          </div>
+          <div class="platform-item">
+            <span class="platform-label">屏幕尺寸:</span>
+            <span class="platform-value">加载中...</span>
+          </div>
+          <div class="platform-item">
+            <span class="platform-label">触摸支持:</span>
+            <span class="platform-value">加载中...</span>
+          </div>
+          <div class="platform-item">
+            <span class="platform-label">PWA模式:</span>
+            <span class="platform-value">加载中...</span>
+          </div>
+          <div class="platform-item">
+            <span class="platform-label">网络状态:</span>
+            <span class="platform-value">加载中...</span>
+          </div>
+          <div class="platform-item">
+            <span class="platform-label">连接类型:</span>
+            <span class="platform-value">加载中...</span>
+          </div>
+          <div class="platform-item">
+            <span class="platform-label">浏览器:</span>
+            <span class="platform-value">加载中...</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 性能优化建议 -->
+      <section class="platform-section" id="performanceSuggestions">
+        <h3>性能优化建议</h3>
+        <p>加载中...</p>
+      </section>
+
+      <!-- PWA状态 -->
+      <section class="platform-section" id="pwaStatus">
+        <h3>PWA状态</h3>
+        <p>加载中...</p>
+      </section>
+
+
+
+
+    </main>
+
+  <!-- 引入平台管理脚本 -->
+  <script src="main.js"></script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>编辑故事记录</title>
+    <link rel="stylesheet" href="../../main/style.css">
+</head>
+<body>
+    <header class="navbar">
+        <div style="display: flex; align-items: center; gap: var(--spacing-lg);">
+            <button id="back-btn" class="btn-outline">返回世界页面</button>
+            <h1>故事记录</h1>
+        </div>
+        <div class="nav-buttons">
+            <button id="add-story-btn" class="btn-outline">添加新记录</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg);">
+            <h2>故事记录列表</h2>
+        </div>
+
+        <div id="stories-tags" style="display: flex; flex-wrap: wrap; gap: var(--spacing-sm); margin-bottom: var(--spacing-xl);">
+            <!-- 故事记录标签将通过JavaScript动态生成 -->
+        </div>
+
+        <!-- 故事记录编辑区域 -->
+        <div style="background-color: var(--card-bg); padding: var(--spacing-lg); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);">
+            <div id="stories-editor">
+                <!-- 故事记录编辑将通过JavaScript动态生成 -->
+            </div>
+        </div>
+    </main>
+
+    <script src="../../main/storage.js"></script>
+    <script src="../../main/helpers.js"></script>
+    <script src="edit.js"></script>
+</body>
+</html>

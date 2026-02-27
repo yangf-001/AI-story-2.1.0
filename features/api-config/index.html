@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>API配置</title>
+    <link rel="stylesheet" href="../../main/style.css">
+    <!-- PWA相关元标签 -->
+    <meta name="description" content="AI故事生成器API配置页面">
+    <meta name="theme-color" content="#3B82F6">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="AI故事">
+    <link rel="manifest" href="../../manifest.json">
+    <link rel="icon" href="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=AI%20story%20generator%20icon%20with%20book%20and%20robot%20illustration%2C%20modern%20flat%20design%2C%20blue%20and%20purple%20colors&image_size=square" type="image/png">
+    <link rel="apple-touch-icon" href="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=AI%20story%20generator%20icon%20with%20book%20and%20robot%20illustration%2C%20modern%20flat%20design%2C%20blue%20and%20purple%20colors&image_size=square">
+</head>
+<body>
+    <header class="navbar">
+        <div style="display: flex; align-items: center; gap: var(--spacing-lg);">
+            <button onclick="window.location.href='../../main/index.html'">返回主页面</button>
+            <h1>API配置</h1>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <form id="api-config-form">
+            <div class="form-group">
+                <label for="ai-service">AI服务选择</label>
+                <select id="ai-service" name="ai-service">
+                    <option value="DeepSeek">DeepSeek</option>
+                    <option value="OpenAI">OpenAI</option>
+                    <option value="Anthropic">Anthropic</option>
+                    <option value="Google">Google</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="api-key">API密钥</label>
+                <input type="password" id="api-key" name="api-key" placeholder="请输入API密钥">
+            </div>
+
+            <div class="form-group">
+                <label for="model">模型选择</label>
+                <select id="model" name="model">
+                    <option value="deepseek-chat">deepseek-chat</option>
+                    <option value="deepseek-coder">deepseek-coder</option>
+                </select>
+            </div>
+
+            <h3>模型参数设置</h3>
+            
+            <div class="form-group">
+                <label for="temperature">温度值 (0-2)</label>
+                <input type="number" id="temperature" name="temperature" min="0" max="2" step="0.1" value="0.7">
+            </div>
+
+            <div class="form-group">
+                <label for="max-tokens">最大 tokens</label>
+                <input type="number" id="max-tokens" name="max-tokens" min="1" max="4096" value="1024">
+            </div>
+
+            <div class="form-group">
+                <label for="frequency-penalty">频率惩罚 (-2-2)</label>
+                <input type="number" id="frequency-penalty" name="frequency-penalty" min="-2" max="2" step="0.1" value="0">
+            </div>
+
+            <div class="form-group">
+                <label for="presence-penalty">存在惩罚 (-2-2)</label>
+                <input type="number" id="presence-penalty" name="presence-penalty" min="-2" max="2" step="0.1" value="0">
+            </div>
+
+            <div style="display: flex; gap: var(--spacing-lg); margin: var(--spacing-xl) 0;">
+                <button type="button" id="test-connection" class="btn-secondary">测试连接</button>
+                <button type="submit" class="btn-primary">保存配置</button>
+            </div>
+
+            <div id="test-result" class="alert" style="display: none;"></div>
+        </form>
+    </main>
+
+    <script src="../../main/api.js"></script>
+    <script src="../../main/storage.js"></script>
+    <script src="config.js"></script>
+    <!-- Service Worker注册 -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('../../service-worker.js')
+                    .then((registration) => {
+                        console.log('Service Worker 注册成功:', registration.scope);
+                    })
+                    .catch((error) => {
+                        console.log('Service Worker 注册失败:', error);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>

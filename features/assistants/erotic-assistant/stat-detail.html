@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数值配置详情</title>
+    <link rel="stylesheet" href="../../main/style.css">
+    <style>
+        /* 主内容区调整 */
+        .main-content {
+            padding: var(--spacing-xl);
+            max-width: 800px;
+            margin: 0 auto;
+            min-height: calc(100vh - 160px);
+            margin-top: 100px; /* 为固定导航栏留出空间 */
+        }
+
+        .header {
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: var(--spacing-sm);
+            color: #BE185D;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: var(--spacing-md);
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .detail-panel {
+            background: linear-gradient(135deg, #FEF2F2, #FEF7FF);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-xl);
+            box-shadow: 0 4px 15px rgba(236, 72, 153, 0.2);
+            border: 2px solid #F9A8D4;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .detail-panel h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-lg);
+            color: #BE185D;
+        }
+
+        .detail-item {
+            margin-bottom: var(--spacing-md);
+            padding-bottom: var(--spacing-md);
+            border-bottom: 1px solid #FECDD3;
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #BE185D;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .detail-value {
+            font-size: 1.125rem;
+            line-height: 1.5;
+        }
+
+        .play-library {
+            margin-top: var(--spacing-xs);
+            padding-left: var(--spacing-md);
+        }
+
+        .play-item {
+            margin-bottom: var(--spacing-xs);
+            list-style-type: disc;
+        }
+
+        .btn-erotic {
+            background: linear-gradient(135deg, #F472B6, #D946EF);
+            color: white;
+            border: none;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .btn-erotic:hover {
+            background: linear-gradient(135deg, #D946EF, #F472B6);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-lg);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1001;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #FEF2F2, #FEF7FF);
+            padding: var(--spacing-xl);
+            border-radius: var(--border-radius-lg);
+            box-shadow: 0 10px 30px rgba(236, 72, 153, 0.4);
+            max-width: 400px;
+            width: 100%;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .modal-content h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-lg);
+            color: #BE185D;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: var(--spacing-md);
+            justify-content: flex-end;
+            margin-top: var(--spacing-lg);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .form-group {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: var(--spacing-xs);
+            font-weight: 500;
+            color: #BE185D;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: var(--spacing-md);
+            border: 1px solid #FECDD3;
+            border-radius: var(--border-radius-md);
+            font-size: 1rem;
+            background-color: white;
+            color: var(--text-color);
+            transition: border-color var(--transition-fast);
+            outline: none;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: #EC4899;
+            box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .detail-input {
+            width: 100%;
+            padding: var(--spacing-md);
+            border: 1px solid #FECDD3;
+            border-radius: var(--border-radius-md);
+            font-size: 1.125rem;
+            background-color: white;
+            color: var(--text-color);
+            transition: border-color var(--transition-fast);
+            outline: none;
+        }
+
+        .detail-input:focus {
+            border-color: #EC4899;
+            box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
+        }
+
+        .thresholds-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: var(--spacing-md);
+        }
+
+        .threshold-item {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xs);
+        }
+
+        .threshold-item label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #BE185D;
+        }
+
+        .threshold-input {
+            padding: var(--spacing-sm);
+            border: 1px solid #FECDD3;
+            border-radius: var(--border-radius-md);
+            font-size: 1rem;
+            background-color: white;
+            color: var(--text-color);
+            transition: border-color var(--transition-fast);
+            outline: none;
+        }
+
+        .threshold-input:focus {
+            border-color: #EC4899;
+            box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
+        }
+
+        .plays-textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: var(--spacing-md);
+            border: 1px solid #FECDD3;
+            border-radius: var(--border-radius-md);
+            font-size: 1rem;
+            background-color: white;
+            color: var(--text-color);
+            transition: border-color var(--transition-fast);
+            outline: none;
+            resize: vertical;
+        }
+
+        .plays-textarea:focus {
+            border-color: #EC4899;
+            box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: var(--spacing-md);
+            }
+
+            .detail-panel {
+                padding: var(--spacing-lg);
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .modal-content {
+                margin: var(--spacing-md);
+                max-width: calc(100% - 2 * var(--spacing-md));
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div style="display: flex; align-items: center; gap: var(--spacing-lg);">
+            <button onclick="window.location.href='erotic-settings.html'">返回设置</button>
+            <h1>数值配置详情</h1>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="header">
+            <a href="erotic-settings.html" class="back-link">← 返回色色小助手设置</a>
+            <h1>数值配置详情</h1>
+            <p>查看和编辑数值配置的详细信息</p>
+        </div>
+
+        <div class="detail-panel" id="stat-detail-panel">
+            <h2>数值配置信息</h2>
+            <div class="detail-item">
+                <div class="detail-label">数值名称</div>
+                <input type="text" id="detail-name" class="detail-input" placeholder="输入数值名称...">
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">阈值设置</div>
+                <div class="thresholds-container">
+                    <div class="threshold-item">
+                        <label>轻度阈值</label>
+                        <input type="number" id="threshold-light" min="0" max="100" class="threshold-input">
+                    </div>
+                    <div class="threshold-item">
+                        <label>中度阈值</label>
+                        <input type="number" id="threshold-medium" min="0" max="100" class="threshold-input">
+                    </div>
+                    <div class="threshold-item">
+                        <label>重度阈值</label>
+                        <input type="number" id="threshold-heavy" min="0" max="100" class="threshold-input">
+                    </div>
+                    <div class="threshold-item">
+                        <label>极端阈值</label>
+                        <input type="number" id="threshold-extreme" min="0" max="100" class="threshold-input">
+                    </div>
+                </div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">轻度玩法库</div>
+                <textarea id="plays-light" class="plays-textarea" placeholder="输入轻度玩法，每行一个..."></textarea>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">中度玩法库</div>
+                <textarea id="plays-medium" class="plays-textarea" placeholder="输入中度玩法，每行一个..."></textarea>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">重度玩法库</div>
+                <textarea id="plays-heavy" class="plays-textarea" placeholder="输入重度玩法，每行一个..."></textarea>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">极端玩法库</div>
+                <textarea id="plays-extreme" class="plays-textarea" placeholder="输入极端玩法，每行一个..."></textarea>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button id="save-stat" class="btn-erotic">保存修改</button>
+            <button id="delete-stat" class="btn-outline">删除数值配置</button>
+            <button id="back-btn" class="btn-outline">返回</button>
+        </div>
+    </main>
+
+
+
+    <script src="../../main/storage.js"></script>
+    <script src="../../main/helpers.js"></script>
+    <script>
+        class StatDetailModule {
+            constructor() {
+                this.currentWorldId = localStorage.getItem('currentWorldId');
+                this.currentStatId = localStorage.getItem('currentStatId');
+                this.assistant = this.getEroticAssistant();
+                this.init();
+            }
+
+            init() {
+                if (!this.currentWorldId) {
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                if (!this.currentStatId) {
+                    window.location.href = 'erotic-settings.html';
+                    return;
+                }
+
+                this.loadStatDetail();
+                this.bindEvents();
+            }
+
+            getEroticAssistant() {
+                const storedAssistants = localStorage.getItem(`assistants_${this.currentWorldId}`);
+                if (storedAssistants) {
+                    const assistants = JSON.parse(storedAssistants);
+                    return assistants.find(a => a.id === 'erotic-assistant');
+                }
+                return null;
+            }
+
+            loadStatDetail() {
+                if (!this.assistant || !this.assistant.settings.stats) {
+                    this.showMessage('数值配置不存在');
+                    return;
+                }
+
+                const stat = this.assistant.settings.stats.find(s => s.id === this.currentStatId);
+                if (!stat) {
+                    this.showMessage('数值配置不存在');
+                    return;
+                }
+
+                const thresholds = stat.thresholds || { 轻度: 30, 中度: 50, 重度: 70, 极端: 90 };
+                const playLibrary = stat.玩法库 || {};
+
+                // 加载数据到表单
+                document.getElementById('detail-name').value = stat.name;
+                document.getElementById('threshold-light').value = thresholds.轻度 || 30;
+                document.getElementById('threshold-medium').value = thresholds.中度 || 50;
+                document.getElementById('threshold-heavy').value = thresholds.重度 || 70;
+                document.getElementById('threshold-extreme').value = thresholds.极端 || 90;
+                document.getElementById('plays-light').value = playLibrary.轻度 ? playLibrary.轻度.join('\n') : '';
+                document.getElementById('plays-medium').value = playLibrary.中度 ? playLibrary.中度.join('\n') : '';
+                document.getElementById('plays-heavy').value = playLibrary.重度 ? playLibrary.重度.join('\n') : '';
+                document.getElementById('plays-extreme').value = playLibrary.极端 ? playLibrary.极端.join('\n') : '';
+            }
+
+            bindEvents() {
+                // 保存按钮
+                document.getElementById('save-stat').addEventListener('click', () => this.saveStat());
+
+                // 删除按钮
+                document.getElementById('delete-stat').addEventListener('click', () => this.deleteStat());
+
+                // 返回按钮
+                document.getElementById('back-btn').addEventListener('click', () => {
+                    window.location.href = 'erotic-settings.html';
+                });
+            }
+
+            saveStat() {
+                const name = document.getElementById('detail-name').value.trim();
+                const thresholdLight = parseInt(document.getElementById('threshold-light').value) || 30;
+                const thresholdMedium = parseInt(document.getElementById('threshold-medium').value) || 50;
+                const thresholdHeavy = parseInt(document.getElementById('threshold-heavy').value) || 70;
+                const thresholdExtreme = parseInt(document.getElementById('threshold-extreme').value) || 90;
+                const playsLight = document.getElementById('plays-light').value.trim().split('\n').map(p => p.trim()).filter(Boolean);
+                const playsMedium = document.getElementById('plays-medium').value.trim().split('\n').map(p => p.trim()).filter(Boolean);
+                const playsHeavy = document.getElementById('plays-heavy').value.trim().split('\n').map(p => p.trim()).filter(Boolean);
+                const playsExtreme = document.getElementById('plays-extreme').value.trim().split('\n').map(p => p.trim()).filter(Boolean);
+
+                if (!name) {
+                    alert('请填写数值名称');
+                    return;
+                }
+
+                const thresholds = {
+                    轻度: thresholdLight,
+                    中度: thresholdMedium,
+                    重度: thresholdHeavy,
+                    极端: thresholdExtreme
+                };
+
+                const playLibrary = {
+                    轻度: playsLight,
+                    中度: playsMedium,
+                    重度: playsHeavy,
+                    极端: playsExtreme
+                };
+
+                const index = this.assistant.settings.stats.findIndex(s => s.id === this.currentStatId);
+                if (index >= 0) {
+                    this.assistant.settings.stats[index] = {
+                        ...this.assistant.settings.stats[index],
+                        name,
+                        thresholds,
+                        玩法库: playLibrary
+                    };
+
+                    this.saveAssistant(this.assistant);
+                    this.showMessage('数值配置保存成功');
+                }
+            }
+
+            deleteStat() {
+                if (confirm('确定要删除这个数值配置吗？')) {
+                    const index = this.assistant.settings.stats.findIndex(s => s.id === this.currentStatId);
+                    if (index >= 0) {
+                        this.assistant.settings.stats.splice(index, 1);
+                        this.saveAssistant(this.assistant);
+                        window.location.href = 'erotic-settings.html';
+                    }
+                }
+            }
+
+            saveAssistant(assistant) {
+                const storedAssistants = localStorage.getItem(`assistants_${this.currentWorldId}`);
+                let assistants = [];
+                if (storedAssistants) {
+                    assistants = JSON.parse(storedAssistants);
+                }
+
+                const index = assistants.findIndex(a => a.id === assistant.id);
+                if (index >= 0) {
+                    assistants[index] = assistant;
+                } else {
+                    assistants.push(assistant);
+                }
+
+                localStorage.setItem(`assistants_${this.currentWorldId}`, JSON.stringify(assistants));
+            }
+
+            showMessage(message) {
+                const messageElement = document.createElement('div');
+                messageElement.className = 'message';
+                messageElement.textContent = message;
+                messageElement.style.padding = 'var(--spacing-sm)';
+                messageElement.style.backgroundColor = 'rgba(236, 72, 153, 0.1)';
+                messageElement.style.border = '1px solid rgba(236, 72, 153, 0.3)';
+                messageElement.style.borderRadius = 'var(--border-radius)';
+                messageElement.style.margin = 'var(--spacing-sm) 0';
+                messageElement.style.textAlign = 'center';
+                messageElement.style.color = '#BE185D';
+
+                const container = document.querySelector('.header') || document.body;
+                container.appendChild(messageElement);
+
+                // 3秒后自动移除消息
+                setTimeout(() => {
+                    messageElement.remove();
+                }, 3000);
+            }
+        }
+
+        // 初始化模块
+        document.addEventListener('DOMContentLoaded', function() {
+            new StatDetailModule();
+        });
+    </script>
+</body>
+</html>

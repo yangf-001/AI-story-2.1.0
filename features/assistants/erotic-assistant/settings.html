@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>色色小助手设置</title>
+    <link rel="stylesheet" href="../../main/style.css">
+    <style>
+        /* 主内容区调整 */
+        .main-content {
+            padding: var(--spacing-xl);
+            max-width: 1000px;
+            margin: 0 auto;
+            min-height: calc(100vh - 160px);
+            margin-top: 100px; /* 为固定导航栏留出空间 */
+        }
+
+        .header {
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: var(--spacing-sm);
+            color: #BE185D;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: var(--spacing-md);
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .settings-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-xl);
+        }
+
+        .settings-panel {
+            background: linear-gradient(135deg, #FEF2F2, #FEF7FF);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-xl);
+            box-shadow: 0 4px 15px rgba(236, 72, 153, 0.2);
+            border: 2px solid #F9A8D4;
+        }
+
+        .settings-panel h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-lg);
+            color: #BE185D;
+        }
+
+        .settings-panel h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-md);
+            color: #EC4899;
+        }
+
+        #keywords-container,
+        #stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            gap: 8px;
+        }
+
+        .keyword-item,
+        .stat-item {
+            background: white;
+            border: 1px solid #FECDD3;
+            border-radius: var(--border-radius-md);
+            padding: 6px;
+            transition: all var(--transition-fast);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 50px;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+
+        .keyword-item.selected,
+        .stat-item.selected {
+            background: #FECDD3;
+            border-color: #EC4899;
+        }
+
+        .keyword-item:hover,
+        .stat-item:hover {
+            box-shadow: 0 2px 8px rgba(236, 72, 153, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .item-actions {
+            display: flex;
+            gap: var(--spacing-xs);
+            margin-top: var(--spacing-sm);
+        }
+
+        .item-actions button {
+            font-size: 0.75rem;
+            padding: 2px 6px;
+        }
+
+        .btn-erotic {
+            background: linear-gradient(135deg, #F472B6, #D946EF);
+            color: white;
+            border: none;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .btn-erotic:hover {
+            background: linear-gradient(135deg, #D946EF, #F472B6);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4);
+        }
+
+        .btn-danger {
+            background: #EF4444;
+            color: white;
+            border: none;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .btn-danger:hover {
+            background: #DC2626;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+        }
+
+        .form-group {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: var(--spacing-xs);
+            font-weight: 500;
+            color: #BE185D;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: var(--spacing-md);
+            border: 1px solid #FECDD3;
+            border-radius: var(--border-radius-md);
+            font-size: 1rem;
+            background-color: white;
+            color: var(--text-color);
+            transition: border-color var(--transition-fast);
+            outline: none;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: #EC4899;
+            box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1001;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #FEF2F2, #FEF7FF);
+            padding: var(--spacing-xl);
+            border-radius: var(--border-radius-lg);
+            box-shadow: 0 10px 30px rgba(236, 72, 153, 0.4);
+            max-width: 400px;
+            width: 100%;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .modal-content h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-lg);
+            color: #BE185D;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: var(--spacing-md);
+            justify-content: flex-end;
+            margin-top: var(--spacing-lg);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: var(--spacing-md);
+            }
+
+            .settings-container {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-lg);
+            }
+
+            .settings-panel {
+                padding: var(--spacing-lg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div style="display: flex; align-items: center; gap: var(--spacing-lg);">
+            <button onclick="window.location.href='index.html'">返回小助手管理</button>
+            <h1>色色小助手设置</h1>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="header">
+            <a href="index.html" class="back-link">← 返回小助手管理</a>
+            <h1>色色小助手高级设置</h1>
+            <p>在这里管理关键词和数值触发设置</p>
+        </div>
+
+        <div class="settings-container">
+            <!-- 关键词设置 -->
+            <div class="settings-panel">
+                <h2>关键词设置</h2>
+                <p>添加和管理触发CG的关键词</p>
+                
+                <div style="display: flex; gap: var(--spacing-md); margin-bottom: var(--spacing-lg);">
+                    <button id="import-keywords" class="btn-erotic" style="flex: 1;">导入关键词</button>
+                    <button id="export-keywords" class="btn-erotic" style="flex: 1;">导出关键词</button>
+                </div>
+                
+                <div id="keywords-container" style="margin: var(--spacing-lg) 0;">
+                    <!-- 关键词列表将通过JavaScript动态生成 -->
+                </div>
+                
+                <!-- 添加关键词表单 -->
+                <div id="add-keyword-form" style="margin-top: var(--spacing-lg); padding: var(--spacing-md); border: 2px dashed #FECDD3; border-radius: var(--border-radius-lg); background-color: rgba(254, 242, 242, 0.5);">
+                    <h3 style="font-size: 1rem; margin-bottom: var(--spacing-md); color: #BE185D;">添加新关键词</h3>
+                    <div style="display: grid; gap: var(--spacing-md);">
+                        <div>
+                            <label style="display: block; margin-bottom: var(--spacing-xs); font-weight: 500; color: #BE185D;">关键词</label>
+                            <input type="text" id="new-keyword-word" placeholder="输入关键词..." style="width: 100%; padding: var(--spacing-sm); border: 1px solid #FECDD3; border-radius: var(--border-radius-md);">
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: var(--spacing-xs); font-weight: 500; color: #BE185D;">玩法</label>
+                            <input type="text" id="new-keyword-play" placeholder="输入玩法..." style="width: 100%; padding: var(--spacing-sm); border: 1px solid #FECDD3; border-radius: var(--border-radius-md);">
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: var(--spacing-xs); font-weight: 500; color: #BE185D;">触发词</label>
+                            <input type="text" id="new-keyword-trigger" placeholder="输入触发词..." style="width: 100%; padding: var(--spacing-sm); border: 1px solid #FECDD3; border-radius: var(--border-radius-md);">
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: var(--spacing-xs); font-weight: 500; color: #BE185D;">描述</label>
+                            <textarea id="new-keyword-description" placeholder="输入描述..." style="width: 100%; min-height: 80px; padding: var(--spacing-sm); border: 1px solid #FECDD3; border-radius: var(--border-radius-md); resize: vertical;"></textarea>
+                        </div>
+                        <button id="add-keyword" class="btn-erotic" style="width: 100%;">添加关键词</button>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: var(--spacing-md); margin-top: var(--spacing-md);">
+                    <div id="keyword-actions" style="display: flex; gap: var(--spacing-xs); flex: 1;">
+                        <button id="delete-keyword-btn" class="btn-danger" style="flex: 1;">删除</button>
+                        <button id="confirm-keyword-delete" class="btn-danger" style="flex: 1; display: none;">确认删除</button>
+                        <button id="cancel-keyword-delete" class="btn-outline" style="flex: 1; display: none;">取消</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 数值设置 -->
+            <div class="settings-panel">
+                <h2>数值设置</h2>
+                <p>添加和管理基于数值阈值的触发设置</p>
+                
+                <div style="display: flex; gap: var(--spacing-md); margin-bottom: var(--spacing-lg);">
+                    <button id="import-stats" class="btn-erotic" style="flex: 1;">导入数值配置</button>
+                    <button id="export-stats" class="btn-erotic" style="flex: 1;">导出数值配置</button>
+                </div>
+                
+                <div id="stats-container" style="margin: var(--spacing-lg) 0;">
+                    <!-- 数值配置列表将通过JavaScript动态生成 -->
+                </div>
+                
+                <!-- 添加数值配置表单 -->
+                <div id="add-stat-form" style="margin-top: var(--spacing-lg); padding: var(--spacing-md); border: 2px dashed #FECDD3; border-radius: var(--border-radius-lg); background-color: rgba(254, 242, 242, 0.5);">
+                    <h3 style="font-size: 1rem; margin-bottom: var(--spacing-md); color: #BE185D;">添加新数值配置</h3>
+                    <div style="display: grid; gap: var(--spacing-md);">
+                        <div>
+                            <label style="display: block; margin-bottom: var(--spacing-xs); font-weight: 500; color: #BE185D;">数值名称</label>
+                            <input type="text" id="new-stat-name" placeholder="输入数值名称..." style="width: 100%; padding: var(--spacing-sm); border: 1px solid #FECDD3; border-radius: var(--border-radius-md);">
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-sm);">
+                            <div>
+                                <label style="display: block; margin-bottom: var(--spacing-xs); font-weight: 500; color: #BE185D; font-size: 0.875rem;">轻度阈值</label>
+                                <input type="number" id="new-stat-threshold-light" placeholder="30" min="0" max="100" style="width: 100%; padding: var(--spacing-sm); border: 1px solid #FECDD3; border-radius: var(--border-radius-md);">
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: var(--spacing-xs); font-weight: 500; color: #BE185D; font-size: 0.875rem;">中度阈值</label>
+                                <input type="number" id="new-stat-threshold-medium" placeholder="50" min="0" max="100" style="width: 100%; padding: var(--spacing-sm); border: 1px solid #FECDD3; border-radius: var(--border-radius-md);">
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: var(--spacing-xs); font-weight: 500; color: #BE185D; font-size: 0.875rem;">重度阈值</label>
+                                <input type="number" id="new-stat-threshold-heavy" placeholder="70" min="0" max="100" style="width: 100%; padding: var(--spacing-sm); border: 1px solid #FECDD3; border-radius: var(--border-radius-md);">
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: var(--spacing-xs); font-weight: 500; color: #BE185D; font-size: 0.875rem;">极端阈值</label>
+                                <input type="number" id="new-stat-threshold-extreme" placeholder="90" min="0" max="100" style="width: 100%; padding: var(--spacing-sm); border: 1px solid #FECDD3; border-radius: var(--border-radius-md);">
+                            </div>
+                        </div>
+                        <button id="add-stat" class="btn-erotic" style="width: 100%;">添加数值配置</button>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: var(--spacing-md); margin-top: var(--spacing-md);">
+                    <div id="stat-actions" style="display: flex; gap: var(--spacing-xs); flex: 1;">
+                        <button id="delete-stat-btn" class="btn-danger" style="flex: 1;">删除</button>
+                        <button id="confirm-stat-delete" class="btn-danger" style="flex: 1; display: none;">确认删除</button>
+                        <button id="cancel-stat-delete" class="btn-outline" style="flex: 1; display: none;">取消</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 全局导入导出 -->
+            <div class="settings-panel" style="grid-column: 1 / -1;">
+                <h2>全局导入导出</h2>
+                <p>导入或导出所有设置</p>
+                
+                <div style="display: flex; gap: var(--spacing-md);">
+                    <button id="import-all" class="btn-erotic" style="flex: 1;">导入所有设置</button>
+                    <button id="export-all" class="btn-erotic" style="flex: 1;">导出所有设置</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 关键词详情模态框 -->
+        <div id="keyword-detail-modal" class="modal">
+            <div class="modal-content">
+                <h3>关键词详情</h3>
+                <div id="keyword-detail-content" style="margin-bottom: var(--spacing-lg);"></div>
+                <div class="modal-actions">
+                    <button id="edit-keyword-detail" class="btn-erotic">编辑</button>
+                    <button id="close-keyword-detail" class="btn-outline">关闭</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 数值配置详情模态框 -->
+        <div id="stat-detail-modal" class="modal">
+            <div class="modal-content">
+                <h3>数值配置详情</h3>
+                <div id="stat-detail-content" style="margin-bottom: var(--spacing-lg);"></div>
+                <div class="modal-actions">
+                    <button id="edit-stat-detail" class="btn-erotic">编辑</button>
+                    <button id="close-stat-detail" class="btn-outline">关闭</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 删除确认模态框 -->
+        <div id="delete-modal" class="modal">
+            <div class="modal-content">
+                <h3>删除确认</h3>
+                <p id="delete-modal-message">请选择要删除的项目：</p>
+                <div id="delete-options" style="margin: var(--spacing-lg) 0;"></div>
+                <div class="modal-actions">
+                    <button id="cancel-delete" class="btn-outline">取消</button>
+                    <button id="confirm-delete" class="btn-danger">确认删除</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 关键词编辑模态框 -->
+    <div id="keyword-modal" class="modal">
+        <div class="modal-content">
+            <h3>编辑关键词</h3>
+            <div class="form-group">
+                <label for="keyword-word">关键词</label>
+                <input type="text" id="keyword-word" placeholder="输入关键词...">
+            </div>
+            <div class="form-group">
+                <label for="keyword-play">玩法</label>
+                <input type="text" id="keyword-play" placeholder="输入玩法...">
+            </div>
+            <div class="form-group">
+                <label for="keyword-trigger">触发词</label>
+                <input type="text" id="keyword-trigger" placeholder="输入触发词...">
+            </div>
+            <div class="form-group">
+                <label for="keyword-description">描述</label>
+                <textarea id="keyword-description" placeholder="输入描述..." style="min-height: 80px;"></textarea>
+            </div>
+            <input type="hidden" id="keyword-id">
+            <div class="modal-actions">
+                <button id="close-keyword-modal" class="btn-outline">取消</button>
+                <button id="save-keyword" class="btn-erotic">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 数值编辑模态框 -->
+    <div id="stat-modal" class="modal">
+        <div class="modal-content">
+            <h3>编辑数值配置</h3>
+            <div class="form-group">
+                <label for="stat-name">数值名称</label>
+                <input type="text" id="stat-name" placeholder="输入数值名称...">
+            </div>
+            
+            <div class="form-group">
+                <label>阈值设置</label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md);">
+                    <div>
+                        <label for="stat-threshold-light" style="font-size: 0.875rem;">轻度阈值</label>
+                        <input type="number" id="stat-threshold-light" placeholder="30" min="0" max="100">
+                    </div>
+                    <div>
+                        <label for="stat-threshold-medium" style="font-size: 0.875rem;">中度阈值</label>
+                        <input type="number" id="stat-threshold-medium" placeholder="50" min="0" max="100">
+                    </div>
+                    <div>
+                        <label for="stat-threshold-heavy" style="font-size: 0.875rem;">重度阈值</label>
+                        <input type="number" id="stat-threshold-heavy" placeholder="70" min="0" max="100">
+                    </div>
+                    <div>
+                        <label for="stat-threshold-extreme" style="font-size: 0.875rem;">极端阈值</label>
+                        <input type="number" id="stat-threshold-extreme" placeholder="90" min="0" max="100">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>玩法库设置</label>
+                <div style="display: flex; flex-direction: column; gap: var(--spacing-md);">
+                    <div>
+                        <label for="stat-plays-light" style="font-size: 0.875rem;">轻度玩法库（每行一个）</label>
+                        <textarea id="stat-plays-light" placeholder="输入轻度玩法，每行一个..." style="min-height: 80px;"></textarea>
+                    </div>
+                    <div>
+                        <label for="stat-plays-medium" style="font-size: 0.875rem;">中度玩法库（每行一个）</label>
+                        <textarea id="stat-plays-medium" placeholder="输入中度玩法，每行一个..." style="min-height: 80px;"></textarea>
+                    </div>
+                    <div>
+                        <label for="stat-plays-heavy" style="font-size: 0.875rem;">重度玩法库（每行一个）</label>
+                        <textarea id="stat-plays-heavy" placeholder="输入重度玩法，每行一个..." style="min-height: 80px;"></textarea>
+                    </div>
+                    <div>
+                        <label for="stat-plays-extreme" style="font-size: 0.875rem;">极端玩法库（每行一个）</label>
+                        <textarea id="stat-plays-extreme" placeholder="输入极端玩法，每行一个..." style="min-height: 80px;"></textarea>
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" id="stat-id">
+            <div class="modal-actions">
+                <button id="close-stat-modal" class="btn-outline">取消</button>
+                <button id="save-stat" class="btn-erotic">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../main/storage.js"></script>
+    <script src="../../main/helpers.js"></script>
+    <script src="erotic-settings.js"></script>
+</body>
+</html>

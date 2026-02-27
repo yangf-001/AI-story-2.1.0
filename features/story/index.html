@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>故事创作</title>
+    <link rel="stylesheet" href="../../main/style.css">
+    <link rel="stylesheet" href="./styles/message.css">
+    <!-- PWA相关元标签 -->
+    <meta name="description" content="AI故事生成器故事创作页面">
+    <meta name="theme-color" content="#3B82F6">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="AI故事">
+    <link rel="manifest" href="../../manifest.json">
+    <link rel="icon" href="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=AI%20story%20generator%20icon%20with%20book%20and%20robot%20illustration%2C%20modern%20flat%20design%2C%20blue%20and%20purple%20colors&image_size=square" type="image/png">
+    <link rel="apple-touch-icon" href="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=AI%20story%20generator%20icon%20with%20book%20and%20robot%20illustration%2C%20modern%20flat%20design%2C%20blue%20and%20purple%20colors&image_size=square">
+</head>
+<body>
+    <header class="navbar">
+        <div style="display: flex; align-items: center; gap: var(--spacing-md); width: 100%; justify-content: space-between; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: var(--spacing-md); flex-shrink: 0;">
+                <button onclick="window.location.href='../world-management/index.html'" class="btn-sm">返回世界页面</button>
+                <h1 style="font-size: 1.5rem;">故事生成器</h1>
+            </div>
+            <div style="flex: 0 1 auto; min-width: 150px; text-align: center; font-size: 1rem; font-weight: 700; color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.5); padding: 8px 16px; background-color: rgba(59, 130, 246, 0.8); border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.2); cursor: pointer;">
+                <span id="currentTime">加载中...</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: var(--spacing-md);">
+                <div id="assistants-status" style="display: grid; grid-template-columns: repeat(2, auto); gap: var(--spacing-xs); align-items: center; max-width: 300px;">
+                    <!-- 小助手状态将通过JavaScript动态生成 -->
+                </div>
+                <div style="font-size: var(--font-size-xs); color: white; opacity: 0.8; margin-left: var(--spacing-sm); padding: 2px 8px; background-color: rgba(0, 0, 0, 0.2); border-radius: var(--border-radius-sm);">
+                    v2.1.13
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- 时间编辑模态框 -->
+    <div id="time-edit-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1000; justify-content: center; align-items: center;">
+        <div style="background-color: var(--card-bg); padding: var(--spacing-xl); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); max-width: 400px; width: 100%;">
+            <h3>编辑时间</h3>
+            <div class="form-group">
+                <label for="time-input">选择时间</label>
+                <input type="datetime-local" id="time-input" class="form-input" style="width: 100%;">
+            </div>
+            <div style="display: flex; gap: var(--spacing-md); justify-content: flex-end; margin-top: var(--spacing-lg);">
+                <button id="close-time-modal" class="btn-outline">取消</button>
+                <button id="save-time" class="btn-primary">保存</button>
+            </div>
+        </div>
+    </div>
+    
+    <style>
+        /* 覆盖默认的main-content样式，减少顶部空白 */
+        .main-content {
+            margin-top: 120px !important;
+            padding: var(--spacing-md) !important;
+        }
+        
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 10px;
+            }
+            .navbar h1 {
+                font-size: 1.2rem !important;
+            }
+            .navbar button {
+                font-size: 0.8rem !important;
+                padding: 6px 12px !important;
+            }
+            #currentTime {
+                font-size: 1rem !important;
+            }
+        }
+        @media (max-width: 480px) {
+            .navbar > div {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                gap: 8px !important;
+            }
+            .navbar > div > div {
+                width: 100%;
+                margin: 0 !important;
+            }
+            .navbar > div > div:first-child {
+                order: 1;
+            }
+            .navbar > div > div:nth-child(2) {
+                order: 2;
+            }
+            .navbar > div > div:nth-child(3) {
+                order: 3;
+            }
+            #currentTime {
+                font-size: 0.9rem !important;
+                padding: 6px 12px !important;
+            }
+            #assistants-status {
+                max-width: 100% !important;
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 4px !important;
+            }
+        }
+    </style>
+
+    <main class="main-content">
+        <!-- 主要故事区域 -->
+        <div class="story-container">
+            <!-- 左侧功能按钮区域 -->
+            <div class="story-controls-left">
+                <!-- 可折叠区域 -->
+                <div class="collapsible-sections">
+
+                    
+
+                </div>
+
+                <!-- 角色选择区域 -->
+                <section class="character-selection-section">
+                    <h3>选择角色</h3>
+                    <div id="character-selection" class="character-selection">
+                        <div id="character-list" class="character-list"></div>
+                    </div>
+                </section>
+                
+                <!-- 故事控制按钮 -->
+                <section class="story-controls">
+                    <button id="start-story" class="btn-primary">开始故事</button>
+                    <button id="end-story" class="btn-outline" disabled>结束故事</button>
+                    <button id="narration-settings" class="btn-outline">输出设置</button>
+                    <button id="toggle-scroll" class="btn-outline">左右滑动</button>
+                    
+                    <!-- 自定义输入区域 -->
+                    <div class="custom-input-section" style="margin-top: var(--spacing-md); position: relative;">
+                        <div class="input-container" style="width: 100%;">
+                            <textarea id="choice-input" placeholder="输入你的自定义选择..." class="choice-input-field" rows="3" style="resize: none; height: auto; min-height: 80px; width: 100%;"></textarea>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- 右侧故事内容区域 -->
+            <div class="story-content-right">
+                <!-- 选择选项区域 -->
+                <section class="choices-section">
+                    <!-- 四个选择选项 -->
+                    <div class="choices-grid" id="choices-grid">
+                        <!-- 选项将通过JavaScript动态生成 -->
+                    </div>
+                    
+    
+                </section>
+
+                <!-- 故事消息列表 -->
+                <section id="story-messages" class="story-messages" style="position: relative;">
+                    <!-- 滑动控制按钮 -->
+                    <div class="scroll-controls left">
+                        <button class="scroll-btn" id="scroll-left">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="15 18 9 12 15 6"></polyline>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="scroll-controls right">
+                        <button class="scroll-btn" id="scroll-right">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </button>
+                    </div>
+                    <!-- 消息将通过JavaScript动态生成 -->
+                </section>
+                <!-- 固定系统提示栏 -->
+                <div id="system-message-bar" class="system-message-bar">
+                    <div class="system-message-content">
+                        欢迎来到故事生成器！选择角色后点击"开始故事"按钮开始新的故事。
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <style>
+        /* 故事容器样式增强 */
+        .story-container {
+            display: flex;
+            flex-direction: row;
+            min-height: 500px;
+            max-height: 600px;
+            height: 600px;
+            width: 100%;
+            max-width: 100%;
+            margin: 0;
+            background: linear-gradient(135deg, var(--card-bg), var(--bg-light));
+            border-radius: var(--border-radius-xl);
+            box-shadow: var(--shadow-xl);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            transition: var(--transition-all);
+        }
+
+        .story-container:hover {
+            box-shadow: var(--shadow-2xl);
+            border-color: var(--primary-light);
+        }
+
+        /* 左侧功能按钮区域 */
+        .story-controls-left {
+            width: 25%;
+            min-width: 200px;
+            max-width: 320px;
+            background: linear-gradient(135deg, var(--card-bg), var(--bg-light));
+            border-right: 1px solid var(--border-light);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            padding-top: var(--spacing-sm);
+        }
+        
+        /* 移动端左侧控制区域调整 */
+        @media (max-width: 768px) {
+            .story-controls-left {
+                width: 100%;
+                max-width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--border-light);
+                max-height: 250px;
+                min-height: 200px;
+            }
+        }
+        
+        /* 长条形屏幕调整 */
+        @media (min-width: 1440px) {
+            .story-controls-left {
+                width: 20%;
+                max-width: 280px;
+            }
+        }
+
+        /* 右侧故事内容区域 */
+        .story-content-right {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* 移动端右侧故事内容区域调整 */
+        @media (max-width: 768px) {
+            .story-content-right {
+                min-height: 300px;
+            }
+        }
+
+        /* 故事消息列表 */
+        .story-messages {
+            flex: 1;
+            padding: var(--spacing-sm);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xs);
+            background-color: var(--bg-light);
+            background-image: 
+                linear-gradient(rgba(59, 130, 246, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(59, 130, 246, 0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+            width: 100%;
+            transition: overflow-y 0.3s ease;
+            min-height: 0;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* 左右滑动模式 */
+        .story-messages.horizontal-scroll {
+            overflow-y: hidden;
+            overflow-x: auto;
+            flex-direction: row;
+            white-space: nowrap;
+            padding: var(--spacing-md);
+            scroll-behavior: smooth;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .story-messages.horizontal-scroll .message {
+            display: inline-block;
+            width: 90%;
+            max-width: 700px;
+            margin-right: var(--spacing-lg);
+            white-space: normal;
+            background-color: white;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: var(--spacing-lg);
+            border: 1px solid var(--border-color);
+            transition: var(--transition-all);
+            flex-shrink: 0;
+            color: var(--text-color);
+        }
+        
+        /* 移动端消息区域调整 */
+        @media (max-width: 768px) {
+            .story-messages {
+                padding: var(--spacing-sm);
+                gap: var(--spacing-xs);
+            }
+            
+            .story-messages.horizontal-scroll .message {
+                width: 95%;
+                max-width: 500px;
+                padding: var(--spacing-md);
+                margin-right: var(--spacing-md);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .story-messages {
+                padding: var(--spacing-xs);
+            }
+            
+            .story-messages.horizontal-scroll .message {
+                width: 98%;
+                max-width: 400px;
+                padding: var(--spacing-sm);
+                margin-right: var(--spacing-sm);
+            }
+        }
+
+        .story-messages.horizontal-scroll .message:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        /* 隐藏滚动条但保留滚动功能 */
+        .story-messages.horizontal-scroll::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .story-messages.horizontal-scroll::-webkit-scrollbar-track {
+            background: var(--bg-light);
+            border-radius: var(--border-radius-full);
+        }
+
+        .story-messages.horizontal-scroll::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: var(--border-radius-full);
+        }
+
+        .story-messages.horizontal-scroll::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-light);
+        }
+
+        /* 滑动控制按钮 */
+        .scroll-controls {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            display: none;
+        }
+
+        .scroll-controls.left {
+            left: 10px;
+        }
+
+        .scroll-controls.right {
+            right: 10px;
+        }
+
+        .scroll-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.9);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition-all);
+        }
+
+        .scroll-btn:hover {
+            background-color: white;
+            box-shadow: var(--shadow-lg);
+            transform: scale(1.1);
+        }
+
+        .story-messages.horizontal-scroll:hover .scroll-controls {
+            display: block;
+        }
+
+        /* 可折叠区域样式 */
+        .collapsible-sections {
+            border-bottom: 1px solid var(--border-color);
+            background-color: var(--card-bg);
+        }
+
+        .collapsible-section {
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .collapsible-section:last-child {
+            border-bottom: none;
+        }
+
+        .collapsible-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-sm) var(--spacing-md);
+            cursor: pointer;
+            transition: var(--transition-all);
+            background-color: var(--bg-light);
+        }
+
+        .collapsible-header:hover {
+            background-color: var(--bg-color);
+            transform: translateY(-1px);
+        }
+
+        .collapsible-header h3 {
+            margin: 0;
+            font-size: var(--font-size-base);
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .collapse-icon {
+            font-size: var(--font-size-xs);
+            color: var(--text-light);
+            transition: var(--transition-all);
+            transform: rotate(0deg);
+        }
+
+        .collapsible-content {
+            padding: var(--spacing-md);
+            background-color: var(--card-bg);
+            border-top: 1px solid var(--border-light);
+            animation: slideIn var(--transition-normal);
+        }
+
+        /* 角色选择区域 */
+        .character-selection-section {
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        /* 故事控制按钮 */
+        .story-controls {
+            padding: var(--spacing-sm) var(--spacing-md);
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+
+        .story-controls button {
+            width: 100%;
+            padding: var(--spacing-sm) var(--spacing-md) !important;
+            font-size: var(--font-size-sm) !important;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* 移动端按钮调整 */
+        @media (max-width: 768px) {
+            .story-controls {
+                padding: var(--spacing-sm);
+                gap: var(--spacing-xs);
+            }
+            
+            .story-controls button {
+                font-size: var(--font-size-sm) !important;
+                padding: var(--spacing-sm) !important;
+                min-height: 44px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .story-controls button {
+                font-size: var(--font-size-sm) !important;
+                padding: var(--spacing-sm) !important;
+                min-height: 40px;
+            }
+        }
+
+        /* 选择选项区域 */
+        .choices-section {
+            padding: var(--spacing-sm);
+            border-bottom: 1px solid var(--border-color);
+            background: linear-gradient(135deg, var(--card-bg), var(--bg-light));
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            flex-shrink: 0;
+        }
+        
+        /* 四个选择选项网格 */
+        .choices-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-xs);
+            margin-bottom: var(--spacing-md);
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .choice-option {
+            padding: var(--spacing-sm);
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+            transition: var(--transition-all);
+            font-size: var(--font-size-xs);
+            font-weight: 500;
+            text-align: center;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            word-wrap: break-word;
+            overflow: hidden;
+        }
+        
+        /* 移动端选择选项调整 */
+        @media (max-width: 768px) {
+            .choices-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: var(--spacing-sm);
+            }
+            
+            .choice-option {
+                min-height: 48px;
+                font-size: var(--font-size-sm);
+                padding: var(--spacing-md);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .choices-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .choice-option {
+                min-height: 52px;
+                font-size: var(--font-size-base);
+            }
+        }
+        
+        .choice-option:hover {
+            border-color: var(--primary-color);
+            background-color: var(--primary-light);
+            box-shadow: var(--shadow-sm);
+            transform: translateY(-2px);
+        }
+        
+        .choice-option:active {
+            transform: translateY(0);
+        }
+        
+        /* 自定义输入区域 */
+        .custom-input-section {
+            margin-top: var(--spacing-xs);
+        }
+
+        .input-container {
+            display: flex;
+            gap: var(--spacing-xs);
+            align-items: center;
+            background-color: var(--card-bg);
+            padding: var(--spacing-xs);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            transition: var(--transition-all);
+            width: 100%;
+        }
+
+        .input-container:focus-within {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .choice-input-field {
+            flex: 1;
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border: none;
+            border-radius: var(--border-radius-md);
+            font-family: var(--font-family);
+            font-size: var(--font-size-sm);
+            outline: none;
+            background-color: transparent;
+            color: var(--text-color);
+        }
+
+        /* 角色标签 */
+        .character-tag {
+            padding: var(--spacing-sm) !important;
+            min-height: 40px !important;
+            font-size: var(--font-size-sm) !important;
+        }
+
+        .choice-input-field::placeholder {
+            color: var(--text-light);
+            transition: var(--transition-all);
+            font-size: var(--font-size-sm);
+        }
+
+        .choice-input-field:focus::placeholder {
+            color: transparent;
+        }
+
+        .send-button {
+            padding: var(--spacing-sm);
+            border-radius: var(--border-radius-full);
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition-all);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-md);
+            min-width: 40px;
+            min-height: 40px;
+        }
+        
+        /* 移动端输入区域调整 */
+        @media (max-width: 768px) {
+            .input-container {
+                padding: var(--spacing-xs);
+                gap: var(--spacing-xs);
+            }
+            
+            .choice-input-field {
+                padding: var(--spacing-xs) var(--spacing-sm);
+                font-size: var(--font-size-sm);
+            }
+            
+            .choice-input-field::placeholder {
+                font-size: var(--font-size-sm);
+            }
+            
+            .send-button {
+                min-width: 40px;
+                min-height: 40px;
+                padding: var(--spacing-sm);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .input-container {
+                padding: var(--spacing-xs);
+            }
+            
+            .choice-input-field {
+                font-size: var(--font-size-sm);
+            }
+            
+            .send-button {
+                min-width: 40px;
+                min-height: 40px;
+            }
+        }
+
+        .send-button:hover {
+            background: linear-gradient(135deg, var(--primary-dark), #1D4ED8);
+            transform: scale(1.05);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .send-button:active {
+            transform: scale(0.95);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .story-container {
+                flex-direction: column;
+                min-height: 800px;
+                margin: 0 var(--spacing-sm);
+            }
+
+            .story-controls-left {
+                width: 100%;
+                max-width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--border-light);
+                max-height: 300px;
+                min-height: 250px;
+                order: 1;
+            }
+
+            .story-content-right {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                order: 2;
+                min-height: 400px;
+            }
+            
+            /* 移动端按键和输出框上下排列 */
+            .story-controls {
+                display: flex;
+                flex-direction: column;
+                gap: var(--spacing-xs);
+            }
+            
+            .custom-input-section {
+                margin-top: var(--spacing-sm);
+            }
+        }
+
+        /* 固定系统提示栏样式 */
+        .system-message-bar {
+            background-color: var(--bg-light);
+            border-top: 1px solid var(--border-color);
+            padding: 4px 12px;
+            width: 100%;
+            flex-shrink: 0;
+            box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .system-message-content {
+            font-size: 0.85rem;
+            color: #666;
+            font-style: italic;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        .character-selection {
+            flex: 1;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .character-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-sm);
+            align-items: center;
+        }
+
+        /* 角色选择样式 */
+        .character-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-sm);
+        }
+
+        .character-item {
+            flex: 0 0 auto;
+        }
+
+        .character-tag {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-md);
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            cursor: pointer;
+            transition: var(--transition-all);
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+            min-width: 100px;
+            min-height: 48px;
+            text-align: center;
+            flex: 0 0 auto;
+        }
+        
+        /* 移动端角色标签调整 */
+        @media (max-width: 768px) {
+            .character-list {
+                justify-content: center;
+                gap: var(--spacing-sm);
+            }
+            
+            .character-tag {
+                min-width: 80px;
+                min-height: 44px;
+                font-size: var(--font-size-sm);
+                padding: var(--spacing-sm);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .character-list {
+                gap: var(--spacing-xs);
+            }
+            
+            .character-tag {
+                min-width: 70px;
+                min-height: 40px;
+                font-size: var(--font-size-xs);
+                padding: var(--spacing-xs);
+            }
+        }
+
+        .character-tag:hover {
+            border-color: var(--primary-color);
+            background-color: var(--primary-light);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .character-tag.selected {
+            border-color: var(--primary-color);
+            background-color: var(--primary-light);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .character-tag.selected span {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .character-tag.main-character {
+            background-color: var(--bg-light);
+            border-color: var(--border-light);
+            cursor: default;
+        }
+
+        .character-tag.main-character:hover {
+            border-color: var(--border-light);
+            background-color: var(--bg-light);
+            box-shadow: none;
+        }
+
+
+
+        /* 滚动条样式增强 */
+        .story-messages::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .story-messages::-webkit-scrollbar-track {
+            background: var(--bg-light);
+            border-radius: var(--border-radius-full);
+        }
+
+        .story-messages::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--border-color), var(--primary-light));
+            border-radius: var(--border-radius-full);
+            border: 2px solid var(--bg-light);
+            transition: var(--transition-all);
+        }
+
+        .story-messages::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+            transform: scale(1.1);
+            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+        }
+    </style>
+
+    <!-- 输出设置模态框 -->
+    <div id="narration-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1000; justify-content: center; align-items: center;">
+        <div style="background-color: var(--card-bg); padding: var(--spacing-xl); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); max-width: 500px; width: 100%;">
+            <h3>输出设置</h3>
+            <div class="form-group">
+                <label for="narration-output">输出格式</label>
+                <select id="narration-output" class="form-input">
+                    <option value="描述性-段落">描述性-段落</option>
+                    <option value="描述性-短句">描述性-短句</option>
+                    <option value="描述性-诗歌">描述性-诗歌</option>
+                    <option value="叙事性-段落">叙事性-段落</option>
+                    <option value="叙事性-短句">叙事性-短句</option>
+                    <option value="叙事性-诗歌">叙事性-诗歌</option>
+                    <option value="抒情性-段落">抒情性-段落</option>
+                    <option value="抒情性-短句">抒情性-短句</option>
+                    <option value="抒情性-诗歌">抒情性-诗歌</option>
+                    <option value="戏剧性-段落">戏剧性-段落</option>
+                    <option value="戏剧性-短句">戏剧性-短句</option>
+                    <option value="戏剧性-诗歌">戏剧性-诗歌</option>
+                    <option value="自定义">自定义</option>
+                </select>
+            </div>
+            <div class="form-group" id="custom-output-group" style="display: none;">
+                <label for="custom-narration-output">自定义输出</label>
+                <input type="text" id="custom-narration-output" placeholder="请输入自定义输出格式..." class="form-input">
+            </div>
+            <div style="display: flex; gap: var(--spacing-md); justify-content: flex-end; margin-top: var(--spacing-lg);">
+                <button id="close-modal" class="btn-outline">关闭</button>
+                <button id="save-narration" class="btn-primary">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 折叠功能
+        function toggleSection(section) {
+            const content = document.getElementById(`${section}-content-wrapper`);
+            const icon = content.previousElementSibling.querySelector('.collapse-icon');
+            
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                icon.textContent = '▲';
+            } else {
+                content.style.display = 'none';
+                icon.textContent = '▼';
+            }
+        }
+    </script>
+    <script src="../../main/api.js"></script>
+    <script src="../../main/storage.js"></script>
+    <script src="../../main/helpers.js"></script>
+    <script type="module" src="../assistants/assistants.js"></script>
+    <script src="managers/TimeManager.js"></script>
+    <script src="managers/NarrationManager.js"></script>
+    <script src="renderers/MessageRenderer.js"></script>
+    <script src="utils/PromptBuilder.js"></script>
+
+    <script src="analyzers/SceneAnalyzer.js"></script>
+    <script type="module" src="story.js"></script>
+    <!-- Service Worker注册 -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('../../service-worker.js')
+                    .then((registration) => {
+                        console.log('Service Worker 注册成功:', registration.scope);
+                    })
+                    .catch((error) => {
+                        console.log('Service Worker 注册失败:', error);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>

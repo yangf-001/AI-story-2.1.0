@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>故事日记</title>
+    <link rel="stylesheet" href="../../main/style.css">
+</head>
+<body>
+    <header class="navbar">
+        <div style="display: flex; align-items: center; gap: var(--spacing-md); width: 100%; justify-content: space-between; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: var(--spacing-md); flex-shrink: 0;">
+                <button onclick="window.location.href='../world-management/index.html'" class="btn-sm">返回世界页面</button>
+                <h1 style="font-size: 1.5rem;">故事日记</h1>
+            </div>
+            <div style="flex: 0 1 auto; min-width: 150px; text-align: center; font-size: 1rem; font-weight: 700; color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.5); padding: 8px 16px; background-color: rgba(59, 130, 246, 0.8); border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.2); cursor: pointer;" onclick="editTime()">
+                <span id="currentTime">加载中...</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: var(--spacing-md);">
+                <div id="assistants-status" style="display: grid; grid-template-columns: repeat(2, auto); gap: var(--spacing-xs); align-items: center; max-width: 300px;">
+                    <!-- 小助手状态将通过JavaScript动态生成 -->
+                </div>
+                <div style="font-size: var(--font-size-xs); color: white; opacity: 0.8; margin-left: var(--spacing-sm); padding: 2px 8px; background-color: rgba(0, 0, 0, 0.2); border-radius: var(--border-radius-sm);">
+                    v2.1.13
+                </div>
+            </div>
+        </div>
+        
+        <!-- 时间编辑模态框 -->
+        <div id="time-edit-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1000; justify-content: center; align-items: center;">
+            <div style="background-color: var(--card-bg); padding: var(--spacing-xl); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); max-width: 400px; width: 100%;">
+                <h3>编辑时间</h3>
+                <div class="form-group">
+                    <label for="time-input">选择时间</label>
+                    <input type="datetime-local" id="time-input" class="form-input" style="width: 100%;">
+                </div>
+                <div style="display: flex; gap: var(--spacing-md); justify-content: flex-end; margin-top: var(--spacing-lg);">
+                    <button onclick="closeTimeModal()" class="btn-outline">取消</button>
+                    <button onclick="saveTime()" class="btn-primary">保存</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <style>
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 10px;
+            }
+            .navbar h1 {
+                font-size: 1.2rem !important;
+            }
+            .navbar button {
+                font-size: 0.8rem !important;
+                padding: 6px 12px !important;
+            }
+            #currentTime {
+                font-size: 1rem !important;
+            }
+        }
+        @media (max-width: 480px) {
+            .navbar > div {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            .navbar > div > div {
+                width: 100%;
+                margin: 5px 0;
+            }
+            .nav-buttons {
+                width: 100%;
+                justify-content: center !important;
+            }
+            #currentTime {
+                font-size: 0.9rem !important;
+            }
+        }
+
+        /* 故事档案样式 */
+        .story-archive-item {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition-all);
+        }
+
+        .story-archive-item:hover {
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary-color);
+        }
+
+        .story-archive-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-sm);
+            cursor: pointer;
+        }
+
+        .story-archive-title {
+            font-size: var(--font-size-base);
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .story-archive-time {
+            font-size: var(--font-size-xs);
+            color: var(--text-light);
+        }
+
+        .story-archive-content {
+            font-size: var(--font-size-sm);
+            color: var(--text-color);
+            line-height: 1.4;
+            margin-bottom: var(--spacing-sm);
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .story-archive-content.expanded {
+            max-height: 1000px;
+            transition: max-height 0.5s ease;
+        }
+
+        .story-archive-meta {
+            font-size: var(--font-size-xs);
+            color: var(--text-light);
+            display: flex;
+            justify-content: space-between;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .story-archive-meta.expanded {
+            max-height: 50px;
+            transition: max-height 0.5s ease;
+        }
+
+        .expand-icon {
+            width: 20px;
+            height: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .expand-icon.expanded {
+            transform: rotate(180deg);
+        }
+
+        .empty-archive {
+            text-align: center;
+            color: var(--text-light);
+            padding: var(--spacing-xl);
+            background-color: var(--card-bg);
+            border: 1px dashed var(--border-color);
+            border-radius: var(--border-radius-lg);
+        }
+    </style>
+
+    <main class="main-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg);">
+            <h2>故事日记</h2>
+            <div style="display: flex; gap: var(--spacing-sm);">
+                <button onclick="refreshArchive()" class="btn-outline">刷新</button>
+                <button onclick="clearArchive()" class="btn-outline">清空日记</button>
+            </div>
+        </div>
+
+        <div id="stories-tags" style="display: flex; flex-wrap: wrap; gap: var(--spacing-sm); margin-bottom: var(--spacing-xl);">
+            <!-- 故事档案标签将通过JavaScript动态生成 -->
+        </div>
+
+        <div id="story-archive-list">
+            <!-- 故事档案详情将通过JavaScript动态生成 -->
+            <div class="empty-archive">
+                <p>暂无故事档案</p>
+            </div>
+        </div>
+
+        <!-- 批量操作区域 -->
+        <div style="margin-top: var(--spacing-xl); background-color: var(--card-bg); padding: var(--spacing-lg); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);">
+            <h3>批量操作</h3>
+            <div style="display: flex; gap: var(--spacing-md); margin-top: var(--spacing-md);">
+                <button id="batch-delete-btn" class="btn-outline">批量删除</button>
+                <button id="batch-export-btn" class="btn-outline">导出日记</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- 导出模态框 -->
+    <div id="export-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1000; justify-content: center; align-items: center;">
+        <div style="background-color: var(--card-bg); padding: var(--spacing-xl); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); max-width: 600px; width: 100%;">
+            <h3>导出故事日记</h3>
+            <div style="margin: var(--spacing-lg) 0;">
+                <textarea id="export-text" readonly style="width: 100%; min-height: 200px; padding: var(--spacing-md); border: 1px solid var(--border-color); border-radius: var(--border-radius-md); background-color: var(--bg-color);"></textarea>
+                <div style="display: flex; gap: var(--spacing-md); flex-wrap: wrap;">
+                    <button id="copy-export" class="btn-outline" style="margin-top: var(--spacing-md);">复制到剪贴板</button>
+                    <button id="download-export" class="btn-outline" style="margin-top: var(--spacing-md);">下载JSON文件</button>
+                </div>
+            </div>
+            <div style="display: flex; gap: var(--spacing-md); justify-content: flex-end; margin-top: var(--spacing-lg);">
+                <button id="close-export-modal" class="btn-outline">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../main/storage.js"></script>
+    <script src="../../main/helpers.js"></script>
+    <script src="index.js"></script>
+</body>
+</html>

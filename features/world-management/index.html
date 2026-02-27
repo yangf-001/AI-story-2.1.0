@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>世界管理</title>
+    <link rel="stylesheet" href="../../main/style.css">
+    <!-- PWA相关元标签 -->
+    <meta name="description" content="AI故事生成器世界管理页面">
+    <meta name="theme-color" content="#3B82F6">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="AI故事">
+    <link rel="manifest" href="../../manifest.json">
+    <link rel="icon" href="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=AI%20story%20generator%20icon%20with%20book%20and%20robot%20illustration%2C%20modern%20flat%20design%2C%20blue%20and%20purple%20colors&image_size=square" type="image/png">
+    <link rel="apple-touch-icon" href="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=AI%20story%20generator%20icon%20with%20book%20and%20robot%20illustration%2C%20modern%20flat%20design%2C%20blue%20and%20purple%20colors&image_size=square">
+</head>
+<body>
+    <header class="navbar">
+        <div style="display: flex; align-items: center; gap: var(--spacing-md); width: 100%; justify-content: space-between; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: var(--spacing-md); flex-shrink: 0;">
+                <button onclick="window.location.href='../../main/index.html'" class="btn-sm">返回主页面</button>
+                <h1 id="world-name" style="font-size: 1.5rem;">剧情世界</h1>
+            </div>
+            <div style="flex: 0 1 auto; min-width: 150px; text-align: center; font-size: 1rem; font-weight: 700; color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.5); padding: 8px 16px; background-color: rgba(59, 130, 246, 0.8); border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.2); cursor: pointer;" onclick="editTime()">
+                <span id="currentTime">加载中...</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: var(--spacing-md);">
+                <div id="assistants-status" style="display: grid; grid-template-columns: repeat(2, auto); gap: var(--spacing-xs); align-items: center; max-width: 300px;">
+                    <!-- 小助手状态将通过JavaScript动态生成 -->
+                </div>
+                <div style="font-size: var(--font-size-xs); color: white; opacity: 0.8; margin-left: var(--spacing-sm); padding: 2px 8px; background-color: rgba(0, 0, 0, 0.2); border-radius: var(--border-radius-sm);">
+                    v2.1.13
+                </div>
+            </div>
+        </div>
+        
+        <!-- 时间编辑模态框 -->
+        <div id="time-edit-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1000; justify-content: center; align-items: center;">
+            <div style="background-color: var(--card-bg); padding: var(--spacing-xl); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); max-width: 400px; width: 100%;">
+                <h3>编辑时间</h3>
+                <div class="form-group">
+                    <label for="time-input">选择时间</label>
+                    <input type="datetime-local" id="time-input" class="form-input" style="width: 100%;">
+                </div>
+                <div style="display: flex; gap: var(--spacing-md); justify-content: flex-end; margin-top: var(--spacing-lg);">
+                    <button onclick="closeTimeModal()" class="btn-outline">取消</button>
+                    <button onclick="saveTime()" class="btn-primary">保存</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <style>
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 10px;
+            }
+            .navbar h1 {
+                font-size: 1.2rem !important;
+            }
+            .navbar button {
+                font-size: 0.8rem !important;
+                padding: 6px 12px !important;
+            }
+            #currentTime {
+                font-size: 1rem !important;
+            }
+            .main-content {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                min-width: 100%;
+                margin-bottom: var(--spacing-lg);
+            }
+            .sidebar-nav {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .sidebar-nav a {
+                flex: 1 1 auto;
+                min-width: 120px;
+                text-align: center;
+            }
+        }
+        @media (max-width: 480px) {
+            .navbar > div {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            .navbar > div > div {
+                width: 100%;
+                margin: 5px 0;
+            }
+            .nav-buttons {
+                width: 100%;
+                justify-content: center !important;
+            }
+            #currentTime {
+                font-size: 0.9rem !important;
+            }
+            .sidebar-nav a {
+                min-width: 100px;
+                font-size: var(--font-size-sm);
+                padding: var(--spacing-sm);
+            }
+        }
+    </style>
+
+    <main class="main-content" style="display: flex; gap: var(--spacing-xl);">
+        <!-- 左侧导航 -->
+        <aside class="sidebar" style="min-width: 200px;">
+            <h3 style="margin-bottom: var(--spacing-md); font-size: 1.1rem; font-weight: 600;">功能导航</h3>
+            <nav class="sidebar-nav">
+                <a href="#" class="active">世界概览</a>
+                <a href="../story/index.html">故事生成器</a>
+                <a href="../character/index.html">角色档案</a>
+                <a href="../story-archive/index.html">故事档案</a>
+                <a href="../assistants/index.html">小助手</a>
+                <div class="dropdown-menu">
+                    <a href="#" class="dropdown-toggle" onclick="toggleDropdown('analytics-platform')">统计与平台</a>
+                    <div id="analytics-platform" class="dropdown-content" style="display: none; padding-left: var(--spacing-md);">
+                        <a href="../analytics/index.html">统计分析</a>
+                        <a href="../platform/index.html">多平台支持</a>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- 主要内容 -->
+        <div style="flex: 1; min-width: 0;">
+            <!-- 世界概览 -->
+            <section id="world-overview" style="margin-bottom: var(--spacing-xl);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-md); padding-bottom: var(--spacing-sm); border-bottom: 1px solid var(--border-color);">
+                    <h2 style="font-size: 1.3rem; font-weight: 600; margin: 0;">世界概览</h2>
+                    <button class="btn-outline btn-sm" onclick="toggleSection('world-overview-content')">展开/收起</button>
+                </div>
+                <div id="world-overview-content" class="section-content" style="display: none; background-color: var(--card-bg); padding: var(--spacing-lg); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);">
+                    <div style="display: flex; justify-content: flex-end; margin-bottom: var(--spacing-md);">
+                        <button class="btn-outline btn-sm" onclick="editWorldInfo()">编辑</button>
+                    </div>
+                    <p><strong>世界名称:</strong> <span id="world-name-display">加载中...</span></p>
+                    <p><strong>创建时间:</strong> <span id="world-created">加载中...</span></p>
+                    <p><strong>当前剧情时间:</strong> <span id="world-time">加载中...</span></p>
+                    <p><strong>故事背景:</strong> <span id="world-background">加载中...</span></p>
+                    <p><strong>世界观设定:</strong> <span id="world-worldview">加载中...</span></p>
+                    <p><strong>故事规范:</strong> <span id="world-story-rules">加载中...</span></p>
+                </div>
+            </section>
+
+            <!-- 世界信息编辑模态框 -->
+            <div id="world-edit-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1000; justify-content: center; align-items: center;">
+                <div style="background-color: var(--card-bg); padding: var(--spacing-xl); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); max-width: 600px; width: 100%; max-height: 80vh; overflow-y: auto;">
+                    <h3>编辑世界信息</h3>
+                    <div class="form-group" style="margin-bottom: var(--spacing-md);">
+                        <label for="edit-world-name">世界名称</label>
+                        <input type="text" id="edit-world-name" class="form-input" style="width: 100%;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: var(--spacing-md);">
+                        <label for="edit-world-background">故事背景</label>
+                        <textarea id="edit-world-background" class="form-input" style="width: 100%; min-height: 100px; resize: vertical;"></textarea>
+                    </div>
+                    <div class="form-group" style="margin-bottom: var(--spacing-md);">
+                        <label for="edit-world-worldview">世界观设定</label>
+                        <textarea id="edit-world-worldview" class="form-input" style="width: 100%; min-height: 100px; resize: vertical;"></textarea>
+                    </div>
+                    <div class="form-group" style="margin-bottom: var(--spacing-md);">
+                        <label for="edit-world-story-rules">故事规范</label>
+                        <textarea id="edit-world-story-rules" class="form-input" style="width: 100%; min-height: 150px; resize: vertical; font-family: monospace;"></textarea>
+                        <small style="display: block; margin-top: 4px; color: #666;">示例：1、角色人设是2025年，现在是2005年，主角刚出生；2、xxxx；3、xxxx</small>
+                    </div>
+                    <div style="display: flex; gap: var(--spacing-md); justify-content: flex-end; margin-top: var(--spacing-lg);">
+                        <button onclick="closeWorldEditModal()" class="btn-outline">取消</button>
+                        <button onclick="saveWorldInfo()" class="btn-primary">保存</button>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <!-- 最近故事记录 -->
+            <section id="recent-stories" style="margin-bottom: var(--spacing-xl);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-md); padding-bottom: var(--spacing-sm); border-bottom: 1px solid var(--border-color);">
+                    <h2 style="font-size: 1.3rem; font-weight: 600; margin: 0;">最近故事记录</h2>
+                    <button class="btn-outline btn-sm" onclick="toggleSection('stories-content')">展开/收起</button>
+                </div>
+                <div id="stories-content" class="section-content" style="display: none; background-color: var(--card-bg); padding: var(--spacing-lg); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);">
+                    <div style="display: flex; justify-content: flex-end; margin-bottom: var(--spacing-md);">
+                        <button id="edit-stories" class="btn-outline btn-sm" onclick="editStories()">编辑</button>
+                    </div>
+                    <div id="stories-list">
+                        <p id="no-stories">暂无故事记录</p>
+                        <!-- 故事记录将通过JavaScript动态生成 -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- 角色列表 -->
+            <section id="characters" style="margin-bottom: var(--spacing-xl);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-md); padding-bottom: var(--spacing-sm); border-bottom: 1px solid var(--border-color);">
+                    <h2 style="font-size: 1.3rem; font-weight: 600; margin: 0;">角色列表</h2>
+                    <button class="btn-outline btn-sm" onclick="toggleSection('characters-content')">展开/收起</button>
+                </div>
+                <div id="characters-content" class="section-content" style="display: none; background-color: var(--card-bg); padding: var(--spacing-lg); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);">
+                    <div style="display: flex; justify-content: flex-end; margin-bottom: var(--spacing-md); gap: var(--spacing-sm);">
+                        <button onclick="window.location.href='../character/card.html?mode=create'" class="btn-primary">添加新角色</button>
+                    </div>
+                    <div id="characters-list">
+                        <!-- 角色卡片将通过JavaScript动态生成 -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- 世界活动统计 -->
+            <section id="world-stats">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-md); padding-bottom: var(--spacing-sm); border-bottom: 1px solid var(--border-color);">
+                    <h2 style="font-size: 1.3rem; font-weight: 600; margin: 0;">世界活动统计</h2>
+                    <button class="btn-outline btn-sm" onclick="toggleSection('stats-content')">展开/收起</button>
+                </div>
+                <div id="stats-content" class="section-content" style="display: none; background-color: var(--card-bg); padding: var(--spacing-lg); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);">
+                    <div class="stats-container">
+                        <div class="stat-card">
+                            <h4>角色数量</h4>
+                            <div class="stat-value" id="stats-characters">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <h4>故事次数</h4>
+                            <div class="stat-value" id="stats-stories">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <h4>日记数量</h4>
+                            <div class="stat-value" id="stats-diaries">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <h4>事件数量</h4>
+                            <div class="stat-value" id="stats-events">0</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="../../main/storage.js"></script>
+    <script src="world.js"></script>
+    <!-- Service Worker注册 -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('../../service-worker.js')
+                    .then((registration) => {
+                        console.log('Service Worker 注册成功:', registration.scope);
+                    })
+                    .catch((error) => {
+                        console.log('Service Worker 注册失败:', error);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>

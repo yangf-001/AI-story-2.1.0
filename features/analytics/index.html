@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>数据统计与分析</title>
+  <link rel="stylesheet" href="../../main/style.css">
+  <style>
+    .analytics-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .stats-section {
+      background: #f9f9f9;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 30px;
+      border: 1px solid #e0e0e0;
+    }
+
+    .stats-section h3 {
+      margin-top: 0;
+      margin-bottom: 20px;
+      color: var(--primary-color);
+      font-size: 1.3rem;
+      border-bottom: 2px solid var(--primary-color);
+      padding-bottom: 10px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .stat-item {
+      background: white;
+      padding: 15px;
+      border-radius: 6px;
+      border: 1px solid #e0e0e0;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      color: #666;
+      font-weight: 500;
+    }
+
+    .stat-value {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+
+    .stats-chart {
+      margin-top: 20px;
+      padding: 20px;
+      background: white;
+      border-radius: 6px;
+      border: 1px solid #e0e0e0;
+    }
+
+    .stats-chart h4 {
+      margin-top: 0;
+      margin-bottom: 15px;
+      color: var(--secondary-color);
+      font-size: 1rem;
+    }
+
+    .chart-container {
+      text-align: center;
+    }
+
+    .chart-container canvas {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin: 30px 0;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .back-button {
+      margin-top: 30px;
+      text-align: center;
+    }
+
+    @media (max-width: 768px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .actions {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .actions button {
+        width: 100%;
+        max-width: 300px;
+      }
+    }
+  </style>
+</head>
+<body>
+    <header class="navbar">
+        <div style="display: flex; align-items: center; gap: var(--spacing-lg);">
+            <button onclick="window.location.href='../world-management/index.html'">返回上一页</button>
+            <h1>数据统计与分析</h1>
+        </div>
+    </header>
+
+    <main class="main-content analytics-container" style="margin-top: 100px;">
+      <!-- 操作按钮 -->
+      <div class="actions">
+        <button id="refreshStats" class="btn btn-primary">刷新统计数据</button>
+        <button id="exportStats" class="btn btn-secondary">导出统计数据</button>
+      </div>
+
+      <!-- 世界信息统计 -->
+      <section class="stats-section" id="worldStats">
+        <h3>世界信息</h3>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-label">世界名称:</span>
+            <span class="stat-value">加载中...</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">创建时间:</span>
+            <span class="stat-value">加载中...</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">最后修改:</span>
+            <span class="stat-value">加载中...</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">角色数量:</span>
+            <span class="stat-value">加载中...</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">故事数量:</span>
+            <span class="stat-value">加载中...</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 故事统计 -->
+      <section class="stats-section" id="storyStats">
+        <h3>故事统计</h3>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-label">总消息数:</span>
+            <span class="stat-value">加载中...</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">用户消息:</span>
+            <span class="stat-value">加载中...</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">AI消息:</span>
+            <span class="stat-value">加载中...</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">平均消息长度:</span>
+            <span class="stat-value">加载中...</span>
+          </div>
+        </div>
+        <div class="stats-chart" id="messageChart">
+          <h4>每日消息数量</h4>
+          <div class="chart-container">
+            <p>加载中...</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 角色统计 -->
+      <section class="stats-section" id="characterStats">
+        <h3>角色统计</h3>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-label">总角色数:</span>
+            <span class="stat-value">加载中...</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">平均属性值:</span>
+            <span class="stat-value">加载中...</span>
+          </div>
+        </div>
+        <div class="stats-chart" id="characterChart">
+          <h4>角色类型分布</h4>
+          <div class="chart-container">
+            <p>加载中...</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- API调用统计 -->
+      <section class="stats-section" id="apiStats">
+        <h3>API调用统计</h3>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-label">总调用次数:</span>
+            <span class="stat-value">加载中...</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">成功次数:</span>
+            <span class="stat-value">加载中...</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">失败次数:</span>
+            <span class="stat-value">加载中...</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">成功率:</span>
+            <span class="stat-value">加载中...</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">平均响应时间:</span>
+            <span class="stat-value">加载中...</span>
+          </div>
+        </div>
+        <div class="stats-chart" id="apiChart">
+          <h4>API服务调用分布</h4>
+          <div class="chart-container">
+            <p>加载中...</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 时间统计 -->
+      <section class="stats-section" id="timeStats">
+        <h3>时间统计</h3>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-label">当前时间:</span>
+            <span class="stat-value">加载中...</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">时间速度:</span>
+            <span class="stat-value">加载中...</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">时间单位:</span>
+            <span class="stat-value">加载中...</span>
+          </div>
+        </div>
+      </section>
+
+
+    </main>
+
+  <!-- 引入必要的脚本 -->
+  <script src="../../main/storage.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>

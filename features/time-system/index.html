@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>时间系统管理</title>
+  <link rel="stylesheet" href="../../main/style.css">
+  <style>
+    .time-display {
+      font-size: 2rem;
+      font-weight: bold;
+      text-align: center;
+      margin: 20px 0;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.05);
+      border-radius: 10px;
+      border: 1px solid #e0e0e0;
+    }
+
+    .time-controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin: 30px 0;
+    }
+
+    .control-group {
+      background: #f9f9f9;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid #e0e0e0;
+    }
+
+    .control-group h3 {
+      margin-top: 0;
+      margin-bottom: 15px;
+      color: var(--primary-color);
+      font-size: 1.2rem;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 15px 0;
+    }
+
+    .time-input-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin: 10px 0;
+    }
+
+    .time-input-group input {
+      flex: 1;
+    }
+
+    .speed-control {
+      margin: 15px 0;
+    }
+
+    .speed-control label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+
+    .speed-control input {
+      width: 100%;
+    }
+
+    .unit-control {
+      margin: 15px 0;
+    }
+
+    .unit-control label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+
+    .quick-actions {
+      margin: 30px 0;
+    }
+
+    .quick-actions h3 {
+      margin-top: 0;
+      margin-bottom: 15px;
+      color: var(--primary-color);
+      font-size: 1.2rem;
+    }
+
+    .back-button {
+      margin-top: 30px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+    <header class="navbar">
+        <div style="display: flex; align-items: center; gap: var(--spacing-lg);">
+            <button onclick="window.location.href='../world-management/index.html'">返回上一页</button>
+            <h1>时间系统管理</h1>
+            <button id="editButton" class="btn btn-primary">编辑</button>
+            <button id="saveButton" class="btn btn-success" disabled>保存</button>
+        </div>
+    </header>
+
+    <main class="main-content" style="margin-top: 100px;">
+      <!-- 当前时间显示 -->
+      <section class="time-display-section">
+        <h2>当前时间</h2>
+        <div class="time-display" id="currentTime">
+          加载中...
+        </div>
+      </section>
+
+      <!-- 时间控制 -->
+      <section class="time-controls">
+        <!-- 时间流逝控制 -->
+        <div class="control-group">
+          <h3>时间流逝控制</h3>
+          <div class="button-group">
+            <button id="startTime" class="btn btn-primary">开始时间流逝</button>
+            <button id="stopTime" class="btn btn-secondary" disabled>停止时间流逝</button>
+            <button id="resetTime" class="btn btn-danger">重置时间</button>
+          </div>
+        </div>
+
+        <!-- 时间速度调整 -->
+        <div class="control-group">
+          <h3>时间速度调整</h3>
+          <div class="speed-control">
+            <label for="timeSpeed">时间速度: <span id="speedValue">1x</span></label>
+            <input type="range" id="timeSpeed" min="0.1" max="10" step="0.1" value="1">
+          </div>
+          <div class="unit-control">
+            <label for="timeUnit">时间单位:</label>
+            <select id="timeUnit">
+              <option value="second">秒</option>
+              <option value="minute" selected>分钟</option>
+              <option value="hour">小时</option>
+              <option value="day">天</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 时间设置 -->
+        <div class="control-group">
+          <h3>时间设置</h3>
+          <div class="time-input-group">
+            <input type="datetime-local" id="timeInput" class="form-input">
+            <button id="setTime" class="btn btn-primary">设置时间</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 快捷时间调整 -->
+      <section class="quick-actions">
+        <h3>快捷时间调整</h3>
+        <div class="button-group">
+          <button id="addHour" class="btn btn-secondary">增加1小时</button>
+          <button id="addDay" class="btn btn-secondary">增加1天</button>
+        </div>
+      </section>
+
+
+    </main>
+
+  <!-- 引入必要的脚本 -->
+  <script src="../../main/storage.js"></script>
+  <script src="main.js"></script>
+  <script>
+    // 更新速度显示
+    const timeSpeedInput = document.getElementById('timeSpeed');
+    const speedValue = document.getElementById('speedValue');
+    if (timeSpeedInput && speedValue) {
+      timeSpeedInput.addEventListener('input', (e) => {
+        speedValue.textContent = `${e.target.value}x`;
+      });
+    }
+  </script>
+</body>
+</html>

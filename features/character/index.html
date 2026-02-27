@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>角色档案</title>
+    <link rel="stylesheet" href="../../main/style.css">
+</head>
+<body>
+    <header class="navbar">
+        <div style="display: flex; align-items: center; gap: var(--spacing-md); width: 100%; justify-content: space-between; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: var(--spacing-md); flex-shrink: 0;">
+                <button onclick="window.location.href='../world-management/index.html'" class="btn-sm">返回世界页面</button>
+                <h1 style="font-size: 1.5rem;">角色档案</h1>
+            </div>
+            <div style="flex: 0 1 auto; min-width: 150px; text-align: center; font-size: 1rem; font-weight: 700; color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.5); padding: 8px 16px; background-color: rgba(59, 130, 246, 0.8); border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.2); cursor: pointer;" onclick="editTime()">
+                <span id="currentTime">加载中...</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: var(--spacing-md);">
+                <div id="assistants-status" style="display: grid; grid-template-columns: repeat(2, auto); gap: var(--spacing-xs); align-items: center; max-width: 300px;">
+                    <!-- 小助手状态将通过JavaScript动态生成 -->
+                </div>
+                <div style="font-size: var(--font-size-xs); color: white; opacity: 0.8; margin-left: var(--spacing-sm); padding: 2px 8px; background-color: rgba(0, 0, 0, 0.2); border-radius: var(--border-radius-sm);">
+                    v2.1.13
+                </div>
+            </div>
+        </div>
+        
+        <!-- 时间编辑模态框 -->
+        <div id="time-edit-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1000; justify-content: center; align-items: center;">
+            <div style="background-color: var(--card-bg); padding: var(--spacing-xl); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); max-width: 400px; width: 100%;">
+                <h3>编辑时间</h3>
+                <div class="form-group">
+                    <label for="time-input">选择时间</label>
+                    <input type="datetime-local" id="time-input" class="form-input" style="width: 100%;">
+                </div>
+                <div style="display: flex; gap: var(--spacing-md); justify-content: flex-end; margin-top: var(--spacing-lg);">
+                    <button onclick="closeTimeModal()" class="btn-outline">取消</button>
+                    <button onclick="saveTime()" class="btn-primary">保存</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <style>
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 10px;
+            }
+            .navbar h1 {
+                font-size: 1.2rem !important;
+            }
+            .navbar button {
+                font-size: 0.8rem !important;
+                padding: 6px 12px !important;
+            }
+            #currentTime {
+                font-size: 1rem !important;
+            }
+        }
+        @media (max-width: 480px) {
+            .navbar > div {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            .navbar > div > div {
+                width: 100%;
+                margin: 5px 0;
+            }
+            .nav-buttons {
+                width: 100%;
+                justify-content: center !important;
+            }
+            #currentTime {
+                font-size: 0.9rem !important;
+            }
+        }
+    </style>
+
+    <main class="main-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg);">
+            <h2>角色列表</h2>
+            <button onclick="window.location.href='card.html?mode=create'" class="btn-primary">添加新角色</button>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-md);">
+            <h3>固定角色</h3>
+            <div style="display: flex; gap: var(--spacing-sm);">
+                <button onclick="openModal('import', 'permanent')" class="btn-outline btn-sm">导入</button>
+                <button onclick="openModal('export', 'permanent')" class="btn-outline btn-sm">导出</button>
+            </div>
+        </div>
+        <div id="permanent-characters" style="display: flex; flex-wrap: wrap; gap: var(--spacing-sm); margin-bottom: var(--spacing-xl);">
+            <!-- 固定角色标签将通过JavaScript动态生成 -->
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-md);">
+            <h3>临时角色</h3>
+            <div style="display: flex; gap: var(--spacing-sm);">
+                <button onclick="openModal('import', 'temporary')" class="btn-outline btn-sm">导入</button>
+                <button onclick="openModal('export', 'temporary')" class="btn-outline btn-sm">导出</button>
+            </div>
+        </div>
+        <div id="temporary-characters" style="display: flex; flex-wrap: wrap; gap: var(--spacing-sm); margin-bottom: var(--spacing-xl);">
+            <!-- 临时角色标签将通过JavaScript动态生成 -->
+        </div>
+
+        <!-- 批量操作区域 -->
+        <div style="margin-top: var(--spacing-xl); background-color: var(--card-bg); padding: var(--spacing-lg); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);">
+            <h3>批量操作</h3>
+            <div style="margin-bottom: var(--spacing-md);">
+                <label style="margin-right: var(--spacing-md);">角色类型:</label>
+                <select id="batch-role-type" style="padding: var(--spacing-sm); border: 1px solid var(--border-color); border-radius: var(--border-radius-md);">
+                    <option value="all">所有角色</option>
+                    <option value="permanent">固定角色</option>
+                    <option value="temporary">临时角色</option>
+                </select>
+            </div>
+            <div style="display: flex; gap: var(--spacing-md); margin-top: var(--spacing-md);">
+                <button id="batch-delete-btn" class="btn-outline">批量删除</button>
+                <button id="batch-import-btn" class="btn-outline">批量导入</button>
+                <button id="batch-export-btn" class="btn-outline">批量导出</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- 导入/导出模态框 -->
+    <div id="import-export-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1000; justify-content: center; align-items: center;">
+        <div style="background-color: var(--card-bg); padding: var(--spacing-xl); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg); max-width: 600px; width: 100%;">
+            <h3 id="modal-title">导入角色</h3>
+            <div id="import-content" style="margin: var(--spacing-lg) 0;">
+                <input type="file" id="import-file" accept=".json" style="margin-bottom: var(--spacing-lg);">
+                <textarea id="import-text" placeholder="或粘贴JSON数据" style="width: 100%; min-height: 200px; padding: var(--spacing-md); border: 1px solid var(--border-color); border-radius: var(--border-radius-md);"></textarea>
+            </div>
+            <div id="export-content" style="margin: var(--spacing-lg) 0; display: none;">
+                <div id="character-selection" style="margin-bottom: var(--spacing-lg);">
+                    <h4 style="margin-bottom: var(--spacing-md);">选择要导出的角色</h4>
+                    <div id="character-list" style="max-height: 200px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--border-radius-md); padding: var(--spacing-sm); background-color: var(--bg-color);"></div>
+                </div>
+                <div style="margin-bottom: var(--spacing-lg);">
+                    <h4 style="margin-bottom: var(--spacing-md);">导出选项</h4>
+                    <div style="display: flex; gap: var(--spacing-md); align-items: center;">
+                        <label style="display: flex; align-items: center; gap: var(--spacing-sm);">
+                            <input type="checkbox" id="export-all" checked> 导出所有选中角色
+                        </label>
+                        <label style="display: flex; align-items: center; gap: var(--spacing-sm);">
+                            <input type="checkbox" id="export-separate" checked> 每个角色单独文件
+                        </label>
+                    </div>
+                </div>
+                <textarea id="export-text" readonly style="width: 100%; min-height: 200px; padding: var(--spacing-md); border: 1px solid var(--border-color); border-radius: var(--border-radius-md); background-color: var(--bg-color);"></textarea>
+                <div style="display: flex; gap: var(--spacing-md); flex-wrap: wrap;">
+                    <button id="copy-export" class="btn-outline" style="margin-top: var(--spacing-md);">复制到剪贴板</button>
+                    <button id="download-export" class="btn-outline" style="margin-top: var(--spacing-md);">下载JSON文件</button>
+                    <button id="download-separate" class="btn-outline" style="margin-top: var(--spacing-md);">单独下载选中角色</button>
+                </div>
+            </div>
+            <div style="display: flex; gap: var(--spacing-md); justify-content: flex-end; margin-top: var(--spacing-lg);">
+                <button id="close-modal-btn" class="btn-outline">关闭</button>
+                <button id="confirm-modal-btn" class="btn-primary">确认</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../main/storage.js"></script>
+    <script src="../../main/helpers.js"></script>
+    <script src="index.js"></script>
+</body>
+</html>
